@@ -5,7 +5,7 @@ export const site = {
   name: "Urban Beetle",
   tagline: "A creative marketing agency",
   email: "support@urbanbeetle.com",
-  generalEmail: "hello@urbanbeetle.com", // shown in the footer
+  generalEmail: "hello@urbanbeetle.com", // shown in the Contact section and footer
   phone: "+91 83569 40351",
   location: "India", // PLACEHOLDER: city / studio address
   socials: [

@@ -17,7 +17,7 @@ export default function Contact() {
             <div>
               <dt>Email</dt>
               <dd>
-                <a href={`mailto:${site.email}`}>{site.email}</a>
+                <a href={`mailto:${site.generalEmail}`}>{site.generalEmail}</a>
               </dd>
             </div>
             <div>
