@@ -28,7 +28,7 @@ export default function Testimonials() {
       onBlurCapture={() => setPaused(false)}
     >
       <div className="container">
-        <Eyebrow index="08">Client Voices</Eyebrow>
+        <Eyebrow index="07">Client Voices</Eyebrow>
         {/* Only announce changes the visitor caused, not every autoplay tick. */}
         <div className="voices__stage" aria-live={paused ? "polite" : "off"} data-reveal="">
           <span className="voices__mark" aria-hidden="true">

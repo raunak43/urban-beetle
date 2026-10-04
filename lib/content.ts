@@ -21,7 +21,6 @@ export const phoneHref = `tel:${site.phone.replace(/\s/g, "")}`;
 export const external = { target: "_blank", rel: "noopener noreferrer" } as const;
 
 export const nav = [
-  { label: "Work", href: "#work" },
   { label: "Services", href: "#services" },
   { label: "About", href: "#about" },
   { label: "Process", href: "#process" },
@@ -91,37 +90,6 @@ export const services = [
     name: "Creative Design",
     body: "Campaign key visuals, packaging, print and digital design with a consistent signature.",
     tags: ["Campaigns", "Packaging", "Print"],
-  },
-];
-
-// PLACEHOLDER: descriptions and services are generic; replace with the real project details.
-export const work = [
-  {
-    slug: "rc-mega",
-    name: "RC Mega",
-    mark: "RC",
-    year: "2025",
-    services: ["Brand identity", "Social media", "Campaign"],
-    line: "A bold identity and launch campaign built for presence and pace.",
-    accent: "#c4483e",
-  },
-  {
-    slug: "dosahub",
-    name: "DosaHub",
-    mark: "DH",
-    year: "2025",
-    services: ["Branding", "Food photography", "Social media"],
-    line: "Turning a much-loved food concept into a brand people crave.",
-    accent: "#e0a43a",
-  },
-  {
-    slug: "yaro-fashion",
-    name: "Yaro Fashion",
-    mark: "Y",
-    year: "2024",
-    services: ["Art direction", "Campaign shoot", "E-commerce"],
-    line: "An editorial fashion language, from lookbook to storefront.",
-    accent: "#d9b9a5",
   },
 ];
 

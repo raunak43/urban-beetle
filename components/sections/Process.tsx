@@ -44,7 +44,7 @@ export default function Process() {
       <div className="container process__grid">
         <div className="process__aside">
           <div className="process__sticky">
-            <Eyebrow index="06">Creative Process</Eyebrow>
+            <Eyebrow index="05">Creative Process</Eyebrow>
             <h2 className="section-title section-title--md" data-split="">
               <Words parts={["From first spark to", { em: "full momentum." }]} />
             </h2>

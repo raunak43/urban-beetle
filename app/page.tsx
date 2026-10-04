@@ -16,7 +16,6 @@ import Services from "@/components/sections/Services";
 import Statement from "@/components/sections/Statement";
 import Testimonials from "@/components/sections/Testimonials";
 import Why from "@/components/sections/Why";
-import Work from "@/components/sections/Work";
 
 const pillarsTicker = ["Strategy", "Creativity", "Technology", "We make brands move"];
 
@@ -39,7 +38,6 @@ export default function Home() {
         <Statement />
         <Marquee items={pillarsTicker} />
         <Services />
-        <Work />
         <Why />
         <About />
         <Process />

@@ -10,7 +10,7 @@ export default function Results() {
       </div>
       <div className="container">
         <header className="section-head">
-          <Eyebrow index="07">Results</Eyebrow>
+          <Eyebrow index="06">Results</Eyebrow>
           <h2 className="section-title" data-split="">
             <Words parts={["Momentum you can", { em: "measure." }]} />
           </h2>

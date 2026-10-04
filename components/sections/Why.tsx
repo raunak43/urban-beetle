@@ -7,7 +7,7 @@ export default function Why() {
       <div className="container">
         <header className="section-head section-head--split">
           <div>
-            <Eyebrow index="04">Why Urban Beetle</Eyebrow>
+            <Eyebrow index="03">Why Urban Beetle</Eyebrow>
             <h2 className="section-title" data-split="">
               <Words parts={["Small in ego.", { em: "Mighty in output." }]} />
             </h2>

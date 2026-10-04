@@ -18,8 +18,8 @@ export default function Statement() {
         </p>
         <div className="statement__foot" data-reveal="stagger">
           <p>Attention is earned through craft. Growth is earned through clarity. We deliver both.</p>
-          <a href="#work" className="link-arrow">
-            See the work <span aria-hidden="true">→</span>
+          <a href="#services" className="link-arrow">
+            Explore our services <span aria-hidden="true">→</span>
           </a>
         </div>
       </div>

@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/motion";
 
 // Soft blur bands along the top and bottom of the screen so only the middle reads sharp, like a
-// camera's focus plane. Off during the cinematic hero and the pinned desktop work gallery (their
-// content sits at the screen edges), and the bottom band clears at the very end of the page.
+// camera's focus plane. Off during the cinematic hero (its text sits at the screen edges), and the
+// bottom band clears at the very end of the page.
 export default function FocusBlur() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -25,19 +25,7 @@ export default function FocusBlur() {
         onToggle: (self) => root.classList.toggle("is-end", self.isActive),
       });
     });
-    const mm = gsap.matchMedia();
-    mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
-      ScrollTrigger.create({
-        trigger: ".work",
-        start: "top top",
-        end: "bottom bottom",
-        onToggle: (self) => root.classList.toggle("is-paused", self.isActive),
-      });
-    });
-    return () => {
-      ctx.revert();
-      mm.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (

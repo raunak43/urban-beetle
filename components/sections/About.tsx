@@ -23,7 +23,7 @@ export default function About() {
         </div>
 
         <div className="about__content">
-          <Eyebrow index="05">About the Agency</Eyebrow>
+          <Eyebrow index="04">About the Agency</Eyebrow>
           <h2 className="section-title section-title--md" data-split="">
             <Words parts={["A studio named after nature's most", { em: "resilient engineer." }]} />
           </h2>
