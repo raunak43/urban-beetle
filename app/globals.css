@@ -397,11 +397,11 @@ em {
   opacity: 1;
 }
 
-/* Focus bands: soft blur at the top and bottom of the screen, sharp in the middle. */
-.focus-blur__top,
-.focus-blur__bottom {
+/* Focus band: soft blur along the top of the screen while reading. */
+.focus-blur__top {
   --focus-blur: 8px;
   position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 60; /* under the nav (80) and menu (75) */
@@ -410,35 +410,18 @@ em {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
+  background: linear-gradient(to bottom, rgba(7, 7, 7, 0.55), rgba(7, 7, 7, 0));
   -webkit-backdrop-filter: blur(var(--focus-blur));
   backdrop-filter: blur(var(--focus-blur));
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent);
+  mask-image: linear-gradient(to bottom, #000 25%, transparent);
   transition: opacity 0.7s var(--ease), visibility 0s linear 0.7s;
 }
 
-.focus-blur__top {
-  top: 0;
-  background: linear-gradient(to bottom, rgba(7, 7, 7, 0.55), rgba(7, 7, 7, 0));
-  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent);
-  mask-image: linear-gradient(to bottom, #000 25%, transparent);
-}
-
-.focus-blur__bottom {
-  bottom: 0;
-  background: linear-gradient(to top, rgba(7, 7, 7, 0.55), rgba(7, 7, 7, 0));
-  -webkit-mask-image: linear-gradient(to top, #000 25%, transparent);
-  mask-image: linear-gradient(to top, #000 25%, transparent);
-}
-
-.focus-blur.is-on > span {
+.focus-blur.is-on > .focus-blur__top {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.7s var(--ease), visibility 0s;
-}
-
-.focus-blur.is-on.is-end > .focus-blur__bottom {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
 }
 
 /* ---------- Preloader ---------- */
@@ -2552,8 +2535,7 @@ em {
     backdrop-filter: none;
   }
 
-  .focus-blur__top,
-  .focus-blur__bottom {
+  .focus-blur__top {
     --focus-blur: 6px;
   }
 }
