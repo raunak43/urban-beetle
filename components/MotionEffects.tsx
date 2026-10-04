@@ -122,8 +122,10 @@ export default function MotionEffects() {
     };
     document.addEventListener("pointermove", onPointer, { passive: true });
 
-    // Web fonts change text metrics, so re-measure every trigger once they are in.
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+    // Web fonts change text metrics, so re-measure every trigger once they are in. The "safe" refresh
+    // waits until the visitor stops scrolling: a forced one briefly resets the scroll position, which
+    // cuts off momentum scrolling on phones and reads as the page jumping.
+    document.fonts?.ready.then(() => ScrollTrigger.refresh(true));
 
     return () => {
       document.removeEventListener("pointermove", onPointer);
