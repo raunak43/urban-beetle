@@ -397,6 +397,51 @@ em {
   opacity: 1;
 }
 
+/* Focus bands: soft blur at the top and bottom of the screen, sharp in the middle. */
+.focus-blur__top,
+.focus-blur__bottom {
+  --focus-blur: 8px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 60; /* under the nav (80) and menu (75) */
+  height: 17vh;
+  height: 17svh;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-backdrop-filter: blur(var(--focus-blur));
+  backdrop-filter: blur(var(--focus-blur));
+  transition: opacity 0.7s var(--ease), visibility 0s linear 0.7s;
+}
+
+.focus-blur__top {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(7, 7, 7, 0.55), rgba(7, 7, 7, 0));
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent);
+  mask-image: linear-gradient(to bottom, #000 25%, transparent);
+}
+
+.focus-blur__bottom {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(7, 7, 7, 0.55), rgba(7, 7, 7, 0));
+  -webkit-mask-image: linear-gradient(to top, #000 25%, transparent);
+  mask-image: linear-gradient(to top, #000 25%, transparent);
+}
+
+.focus-blur.is-on > span {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.7s var(--ease), visibility 0s;
+}
+
+.focus-blur.is-on.is-paused > span,
+.focus-blur.is-on.is-end > .focus-blur__bottom {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
+}
+
 /* ---------- Preloader ---------- */
 
 .preloader {
@@ -2729,12 +2774,61 @@ em {
     grid-template-columns: 1fr 1fr;
   }
 
+  /* Connect gets the full width so the email address stays on one line. */
+  .footer__cols > :last-child {
+    grid-column: 1 / -1;
+  }
+
   .footer__bottom {
     flex-direction: column;
   }
 
   .grain {
     animation: none;
+  }
+}
+
+/* Phones and tablets: keep scrolling smooth by dropping effects that repaint every frame. */
+@media (hover: none) and (pointer: coarse) {
+  .sw--em > span,
+  .gold-text,
+  .hero-chapter__title em,
+  .hero-outro__title em,
+  .btn--gold,
+  .contact__cta,
+  .cta__button,
+  .nav__mark,
+  .footer__mark,
+  .hero-intro__mark,
+  .preloader__mark-fill {
+    animation: none;
+  }
+
+  .hs-line {
+    filter: none;
+  }
+
+  .hero__particles {
+    mix-blend-mode: normal;
+  }
+
+  .grain {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: none;
+  }
+
+  /* The focus bands already blur behind the nav, so it doesn't need its own. */
+  .nav.is-scrolled {
+    background: rgba(7, 7, 7, 0.7);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .focus-blur__top,
+  .focus-blur__bottom {
+    --focus-blur: 6px;
   }
 }
 

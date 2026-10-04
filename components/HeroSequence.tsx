@@ -162,7 +162,8 @@ export default function HeroSequence() {
     }
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Phones get a slightly lighter canvas (1.5x) so every frame draws fast.
+      const dpr = Math.min(window.devicePixelRatio || 1, isTouch() ? 1.5 : 2);
       const rect = canvas.getBoundingClientRect();
       cw = canvas.width = Math.max(1, Math.round(rect.width * dpr));
       ch = canvas.height = Math.max(1, Math.round(rect.height * dpr));
@@ -205,8 +206,9 @@ export default function HeroSequence() {
           trigger: section,
           start: "top top",
           end: "bottom bottom",
-          // Desktop scroll is already smoothed by Lenis; on touch, a short scrub lag smooths native scrolling.
-          scrub: isTouch() ? 0.5 : true,
+          // Follow the scroll exactly: desktop scroll is already smoothed by Lenis, and on touch any lag
+          // makes the scene keep moving after the finger stops, which reads as the page scrolling itself.
+          scrub: true,
           onUpdate: (self) => {
             barRef.current!.style.transform = `scaleY(${self.progress})`;
             let next = 0;

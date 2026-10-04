@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { prefersReducedMotion } from "@/lib/motion";
+import { isTouch, prefersReducedMotion } from "@/lib/motion";
 
 type Dust = { x: number; y: number; size: number; vx: number; vy: number; alpha: number; twinkle: number; phase: number };
 
@@ -14,6 +14,9 @@ export default function Particles({ className, density = 1 }: { className?: stri
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
     const still = prefersReducedMotion();
+    // Phones draw fewer, lower-resolution motes to keep scrolling smooth.
+    const touch = isTouch();
+    const amount = touch ? density * 0.55 : density;
 
     const sprite = document.createElement("canvas");
     sprite.width = sprite.height = 64;
@@ -37,7 +40,7 @@ export default function Particles({ className, density = 1 }: { className?: stri
 
     const seed = () => {
       const area = (w * h) / (dpr * dpr);
-      const n = Math.max(18, Math.min(90, Math.round((area / 20000) * density)));
+      const n = Math.max(12, Math.min(90, Math.round((area / 20000) * amount)));
       dust = Array.from({ length: n }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -51,7 +54,7 @@ export default function Particles({ className, density = 1 }: { className?: stri
     };
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, touch ? 1.5 : 2);
       const rect = canvas.getBoundingClientRect();
       w = canvas.width = Math.max(1, Math.round(rect.width * dpr));
       h = canvas.height = Math.max(1, Math.round(rect.height * dpr));

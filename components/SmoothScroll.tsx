@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
-import { gsap, ScrollTrigger, setLenis, prefersReducedMotion, scrollToTarget, loader } from "@/lib/motion";
+import { gsap, ScrollTrigger, setLenis, prefersReducedMotion, isTouch, scrollToTarget, loader } from "@/lib/motion";
 
 export default function SmoothScroll() {
   useEffect(() => {
@@ -10,13 +10,14 @@ export default function SmoothScroll() {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 
-    // Touch devices keep native momentum scrolling (it already feels right and is cheaper);
-    // ScrollTrigger scrub smoothing takes care of the animations there.
+    // The mobile address bar showing/hiding must not trigger a re-measure mid-scroll.
     ScrollTrigger.config({ ignoreMobileResize: true });
 
     let lenis: Lenis | null = null;
     let tick: ((time: number) => void) | null = null;
-    if (!prefersReducedMotion()) {
+    // Only mice and trackpads get Lenis. Phones and tablets keep native scrolling: it is smoother
+    // there, and a JS scroller can fight the finger (e.g. during an animated jump), causing judder.
+    if (!prefersReducedMotion() && !isTouch()) {
       lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.95, smoothWheel: true });
       setLenis(lenis);
       lenis.on("scroll", ScrollTrigger.update);

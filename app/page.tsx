@@ -1,4 +1,5 @@
 import Cursor from "@/components/Cursor";
+import FocusBlur from "@/components/FocusBlur";
 import HeroSequence from "@/components/HeroSequence";
 import Marquee from "@/components/Marquee";
 import MotionEffects from "@/components/MotionEffects";
@@ -50,6 +51,7 @@ export default function Home() {
 
       <Marquee items={pillarsTicker} reverse className="marquee--outline" />
       <Footer />
+      <FocusBlur />
       <MotionEffects />
     </>
   );
