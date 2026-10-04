@@ -10,8 +10,14 @@ export default function SmoothScroll() {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 
-    // The mobile address bar showing/hiding must not trigger a re-measure mid-scroll.
-    ScrollTrigger.config({ ignoreMobileResize: true });
+    // Every re-measure briefly resets the scroll position. On phones that can nudge the page (Safari's
+    // toolbar reacts to it), so phones only re-measure on real resizes such as rotating the device,
+    // never on the late "load" event or when returning to the tab. The address bar showing/hiding is
+    // ignored too.
+    ScrollTrigger.config({
+      ignoreMobileResize: true,
+      ...(isTouch() && { autoRefreshEvents: "DOMContentLoaded,resize" }),
+    });
 
     let lenis: Lenis | null = null;
     let tick: ((time: number) => void) | null = null;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { gsap, ScrollTrigger, isTouch, prefersReducedMotion } from "@/lib/motion";
+import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion } from "@/lib/motion";
 
 // Wires up the declarative animation attributes used throughout the page:
 //   data-reveal / data-reveal="stagger"   fade + rise when scrolled into view
@@ -125,7 +125,10 @@ export default function MotionEffects() {
     // Web fonts change text metrics, so re-measure every trigger once they are in. The "safe" refresh
     // waits until the visitor stops scrolling: a forced one briefly resets the scroll position, which
     // cuts off momentum scrolling on phones and reads as the page jumping.
-    document.fonts?.ready.then(() => ScrollTrigger.refresh(true));
+    // On phones, only while the preloader still covers the page; afterwards the reset could be seen.
+    document.fonts?.ready.then(() => {
+      if (!isTouch() || !loader.introStarted) ScrollTrigger.refresh(true);
+    });
 
     return () => {
       document.removeEventListener("pointermove", onPointer);

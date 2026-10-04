@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { process } from "@/lib/content";
-import { gsap, ScrollTrigger } from "@/lib/motion";
+import { gsap } from "@/lib/motion";
 import { Eyebrow, Words, pad2 } from "../Text";
 
 export default function Process() {
@@ -23,20 +23,28 @@ export default function Process() {
           scrollTrigger: { trigger: list, start: "top center", end: "bottom center", scrub: true },
         },
       );
-      // Focus follows the middle of the screen: the step crossing it is sharp, the rest blur back.
-      steps.forEach((step, i) => {
-        ScrollTrigger.create({
-          trigger: step,
-          start: "top center",
-          end: "bottom center",
-          onToggle: (self) => {
-            step.classList.toggle("is-active", self.isActive);
-            if (self.isActive) bigRef.current!.textContent = pad2(i + 1);
-          },
-        });
-      });
     });
-    return () => ctx.revert();
+
+    // Focus follows the middle of the screen: the step crossing a thin band at the centre is sharp,
+    // the rest blur back. The browser measures this itself on every frame, so it stays exact on
+    // phones even while Safari's toolbar resizes the viewport. The last focused step stays sharp
+    // when the band moves past the list.
+    const focus = (index: number) => {
+      steps.forEach((step, i) => step.classList.toggle("is-active", i === index));
+      bigRef.current!.textContent = pad2(index + 1);
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) if (entry.isIntersecting) focus(steps.indexOf(entry.target as HTMLElement));
+      },
+      { rootMargin: "-49% 0px -50% 0px" },
+    );
+    steps.forEach((step) => observer.observe(step));
+
+    return () => {
+      observer.disconnect();
+      ctx.revert();
+    };
   }, []);
 
   return (

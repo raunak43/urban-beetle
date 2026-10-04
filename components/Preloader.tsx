@@ -5,6 +5,7 @@ import BeetleMark from "./BeetleMark";
 import { gsap, loader } from "@/lib/motion";
 
 const MIN_VISIBLE_MS = 1400;
+const FONT_WAIT_MS = 2500;
 
 export default function Preloader() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -29,9 +30,17 @@ export default function Preloader() {
     const chase = (target: number, duration = 0.6) =>
       gsap.to(shown, { value: target, duration, ease: "power2.out", overwrite: true, onUpdate: render });
 
-    const leave = () => {
+    let cancelled = false;
+    const leave = async () => {
       if (leaving) return;
       leaving = true;
+      // Let the web fonts land while the preloader still covers the page: a font swap after the
+      // reveal re-flows text, and Safari (no scroll anchoring) shows that as the page jumping.
+      await Promise.race([
+        document.fonts?.ready ?? Promise.resolve(),
+        new Promise((resolve) => setTimeout(resolve, FONT_WAIT_MS)),
+      ]);
+      if (cancelled) return;
       const wait = Math.max(0, MIN_VISIBLE_MS - (performance.now() - started)) / 1000;
       gsap
         .timeline({ delay: wait })
@@ -54,6 +63,7 @@ export default function Preloader() {
     const offProgress = loader.onProgress(() => chase(loader.progress * 0.95));
     const offReady = loader.onReady(leave);
     return () => {
+      cancelled = true;
       offProgress();
       offReady();
     };
