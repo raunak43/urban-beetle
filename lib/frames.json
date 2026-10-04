@@ -1,0 +1,11 @@
+{
+  "version": "mutvxj7a",
+  "desktop": {
+    "count": 240,
+    "path": "/frames/desktop"
+  },
+  "mobile": {
+    "count": 120,
+    "path": "/frames/mobile"
+  }
+}
