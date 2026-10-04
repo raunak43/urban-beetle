@@ -20,14 +20,15 @@ export default function Process() {
         {
           scaleY: 1,
           ease: "none",
-          scrollTrigger: { trigger: list, start: "top 60%", end: "bottom 60%", scrub: true },
+          scrollTrigger: { trigger: list, start: "top center", end: "bottom center", scrub: true },
         },
       );
+      // Focus follows the middle of the screen: the step crossing it is sharp, the rest blur back.
       steps.forEach((step, i) => {
         ScrollTrigger.create({
           trigger: step,
-          start: "top 60%",
-          end: "bottom 60%",
+          start: "top center",
+          end: "bottom center",
           onToggle: (self) => {
             step.classList.toggle("is-active", self.isActive);
             if (self.isActive) bigRef.current!.textContent = pad2(i + 1);

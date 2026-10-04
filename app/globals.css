@@ -1878,11 +1878,15 @@ em {
   list-style: none;
 }
 
+/* Out-of-focus steps: blurred, dimmed and set back slightly. The one at the centre of the screen is sharp. */
 .step {
   position: relative;
   padding-bottom: clamp(64px, 9vw, 120px);
-  opacity: 0.32;
-  transition: opacity 0.7s var(--ease);
+  opacity: 0.3;
+  filter: blur(5px);
+  transform: scale(0.96);
+  transform-origin: left center;
+  transition: opacity 0.8s var(--ease), filter 0.8s var(--ease), transform 1s var(--ease);
 }
 
 .step:last-child {
@@ -1891,6 +1895,8 @@ em {
 
 .step.is-active {
   opacity: 1;
+  filter: blur(0);
+  transform: none;
 }
 
 .step__dot {
@@ -2894,5 +2900,7 @@ em {
 
   .step {
     opacity: 1;
+    filter: none;
+    transform: none;
   }
 }
