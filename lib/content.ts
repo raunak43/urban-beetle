@@ -182,15 +182,6 @@ export const process = [
   },
 ];
 
-export const tech = [
-  { title: "AI-assisted research", body: "Audience, trend and competitor insight in days, not weeks." },
-  { title: "Generative production", body: "Faster concepting and content variations, always finished by human craft." },
-  { title: "Marketing automation", body: "Journeys, CRM flows and lead capture that work while you sleep." },
-  { title: "Performance analytics", body: "Live dashboards that connect creative work to revenue." },
-  { title: "Modern web stack", body: "Fast, secure, scalable websites built on current frameworks." },
-  { title: "Creative testing", body: "Structured experiments to find the ads and messages that win." },
-];
-
 // PLACEHOLDER: replace with the agency's real numbers.
 export const results = [
   { value: 120, suffix: "+", label: "Brands moved" },

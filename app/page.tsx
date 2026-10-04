@@ -13,7 +13,6 @@ import Process from "@/components/sections/Process";
 import Results from "@/components/sections/Results";
 import Services from "@/components/sections/Services";
 import Statement from "@/components/sections/Statement";
-import Tech from "@/components/sections/Tech";
 import Testimonials from "@/components/sections/Testimonials";
 import Why from "@/components/sections/Why";
 import Work from "@/components/sections/Work";
@@ -43,7 +42,6 @@ export default function Home() {
         <Why />
         <About />
         <Process />
-        <Tech />
         <Results />
         <Testimonials />
         <CTA />

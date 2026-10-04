@@ -1886,166 +1886,6 @@ em {
   font-size: 1.05rem;
 }
 
-/* ---------- AI + Technology ---------- */
-
-.tech {
-  overflow: hidden;
-  background: linear-gradient(180deg, var(--bg), #0a0a09 25%, #0a0a09 75%, var(--bg));
-}
-
-.tech__bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 72px 72px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000, transparent 75%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000, transparent 75%);
-  opacity: 0.6;
-}
-
-.tech__scan {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
-  background: linear-gradient(to bottom, transparent, rgba(212, 169, 79, 0.09), transparent);
-  animation: scan 8s linear infinite;
-}
-
-.tech__grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: clamp(40px, 6vw, 120px);
-}
-
-.terminal {
-  margin-top: 40px;
-  padding: 20px 24px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(10, 10, 10, 0.75);
-  font-family: var(--mono);
-  font-size: 13px;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-}
-
-.terminal p {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin: 6px 0;
-}
-
-.terminal__prompt {
-  color: var(--gold);
-}
-
-.terminal__dots {
-  flex: 1;
-  min-width: 16px;
-  border-bottom: 1px dotted var(--line-strong);
-  transform: translateY(-4px);
-}
-
-.terminal__status {
-  color: var(--gold-light);
-}
-
-.tech__visual {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-}
-
-.tech__rings span {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  animation: spin 46s linear infinite;
-}
-
-.tech__rings span::before {
-  content: "";
-  position: absolute;
-  top: -4px;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 14px var(--gold);
-}
-
-.tech__rings span:nth-child(2) {
-  inset: 11%;
-  border-style: dashed;
-  animation-duration: 64s;
-  animation-direction: reverse;
-}
-
-.tech__rings span:nth-child(3) {
-  inset: 22%;
-  border-color: rgba(212, 169, 79, 0.28);
-  animation-duration: 30s;
-}
-
-.tech__orb {
-  position: absolute;
-  inset: 20%;
-  overflow: hidden;
-  border-radius: 50%;
-  -webkit-mask-image: radial-gradient(circle, #000 52%, transparent 71%);
-  mask-image: radial-gradient(circle, #000 52%, transparent 71%);
-}
-
-.tech__orb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 34% 50%;
-  transform: scale(1.35);
-}
-
-.tech__list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  margin: clamp(64px, 8vw, 120px) 0 0;
-  padding: 0;
-  list-style: none;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-
-.tech__list li {
-  padding: clamp(24px, 2.6vw, 36px);
-  background: var(--bg);
-}
-
-.tech__code {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--gold);
-}
-
-.tech__list h3 {
-  margin: 28px 0 8px;
-  font-size: 1.3rem;
-  letter-spacing: -0.02em;
-}
-
-.tech__list p {
-  margin: 0;
-  color: var(--muted);
-}
-
 /* ---------- Results ---------- */
 
 .results {
@@ -2624,8 +2464,7 @@ em {
    ========================================================================== */
 
 @media (max-width: 1100px) {
-  .why__grid,
-  .tech__list {
+  .why__grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -2741,7 +2580,6 @@ em {
 
   .about__grid,
   .process__grid,
-  .tech__grid,
   .contact__grid,
   .footer__top {
     grid-template-columns: 1fr;
@@ -2759,12 +2597,6 @@ em {
 
   .process__big {
     display: none;
-  }
-
-  .tech__visual {
-    max-width: 480px;
-    width: 100%;
-    margin-inline: auto;
   }
 }
 
@@ -2846,8 +2678,7 @@ em {
     background: linear-gradient(to bottom, transparent 0, var(--bg) 35vh);
   }
 
-  .why__grid,
-  .tech__list {
+  .why__grid {
     grid-template-columns: 1fr;
   }
 
@@ -2862,15 +2693,6 @@ em {
   .traits li {
     grid-template-columns: 1fr;
     gap: 4px;
-  }
-
-  .terminal {
-    padding: 16px;
-    font-size: 11px;
-  }
-
-  .terminal p {
-    gap: 8px;
   }
 
   .results__grid {

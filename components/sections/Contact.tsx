@@ -6,7 +6,7 @@ export default function Contact() {
     <section className="contact section" id="contact">
       <div className="container contact__grid">
         <div className="contact__intro">
-          <Eyebrow index="10">Contact</Eyebrow>
+          <Eyebrow index="09">Contact</Eyebrow>
           <h2 className="section-title" data-split="">
             <Words parts={["Tell us where", "you want to", { em: "go." }]} />
           </h2>
