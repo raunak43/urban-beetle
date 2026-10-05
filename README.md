@@ -59,3 +59,13 @@ npm run frames -- assets/beetle-hero.mp4
 This needs [ffmpeg](https://ffmpeg.org/) on your PATH (or `FFMPEG_PATH` pointing to it). It regenerates `public/frames/`, the beetle stills in `public/images/`, and `lib/frames.json`.
 
 The script also paints the video generator's small corner logo out of every frame (the original video file is left untouched). The logo's area is set by `cornerMark` near the top of `scripts/extract-frames.mjs`; set it to `null` for a video without one.
+
+## Changing the Strategy / Creativity / Technology photos
+
+The three photo cards are cut from one designed image, `assets/pillars.webp` (three side-by-side panels). After replacing it, run:
+
+```bash
+npm run pillars
+```
+
+This keeps each panel's photo above its printed headline, paints out the printed number mark (the page draws its own), and writes `public/images/pillars/`. The panel positions and crop are set at the top of `scripts/pillar-images.mjs`.

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "frames": "node scripts/extract-frames.mjs",
+    "pillars": "node scripts/pillar-images.mjs",
     "telegram:chat-id": "node scripts/telegram.mjs chat-id",
     "telegram:test": "node scripts/telegram.mjs test"
   },
@@ -22,6 +23,7 @@
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "sharp": "^0.35.5",
     "typescript": "^6.0.3"
   }
 }

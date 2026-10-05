@@ -1,5 +1,24 @@
+import Image from "next/image";
 import { pillars } from "@/lib/content";
 import { Eyebrow, Words, pad2 } from "../Text";
+
+// A line running into a gold ring, with a spark inside for Technology.
+function PillarIcon({ spark }: { spark: boolean }) {
+  return (
+    <svg className="pillar__icon" viewBox="0 0 78 52" aria-hidden="true">
+      <path d={spark ? "M0 26H28" : "M0 26H78"} />
+      <circle cx="52" cy="26" r="24" />
+      {spark ? (
+        <>
+          <path d="M52 11v8M52 33v8M37 26h8M59 26h8M44.2 18.2l2.8 2.8M57 31l2.8 2.8M59.8 18.2L57 21M47 31l-2.8 2.8" />
+          <circle className="pillar__icon-fill" cx="52" cy="26" r="4.5" />
+        </>
+      ) : (
+        <circle className="pillar__icon-fill" cx="52" cy="26" r="2" />
+      )}
+    </svg>
+  );
+}
 
 export default function Statement() {
   return (
@@ -29,15 +48,16 @@ export default function Statement() {
         <div className="pillars__grid" data-reveal="stagger">
           {pillars.map((p, i) => (
             <article key={p.word} className="pillar glow-card">
-              <span className="pillar__num">{pad2(i + 1)}</span>
+              <div className="pillar__media" aria-hidden="true">
+                <Image src={p.image} alt="" width={1320} height={810} sizes="(max-width: 899px) 100vw, 33vw" />
+              </div>
+              <div className="pillar__head" aria-hidden="true">
+                <span className="pillar__num">{pad2(i + 1)}</span>
+                <PillarIcon spark={p.icon === "spark"} />
+              </div>
               <h3 className="pillar__word">{p.word}</h3>
               <p className="pillar__line">{p.line}</p>
               <p className="pillar__body">{p.body}</p>
-              {i < pillars.length - 1 && (
-                <span className="pillar__plus" aria-hidden="true">
-                  +
-                </span>
-              )}
             </article>
           ))}
         </div>

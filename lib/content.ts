@@ -27,23 +27,30 @@ export const nav = [
   { label: "Contact", href: "#contact" },
 ];
 
+// Photos are cut from assets/pillars.webp by `npm run pillars`.
 export const pillars = [
   {
     word: "Strategy",
     line: "Every move starts with a reason.",
     body: "Research, positioning and a plan that ties creative work to business goals.",
+    image: "/images/pillars/strategy.webp",
+    icon: "ring",
   },
   {
     word: "Creativity",
     line: "Ideas people actually remember.",
     body: "Identity, content and campaigns crafted to stop the scroll and stay in the mind.",
+    image: "/images/pillars/creativity.webp",
+    icon: "ring",
   },
   {
     word: "Technology",
     line: "Built to scale, measured to grow.",
     body: "Websites, automation, AI-assisted workflows and data that keeps every campaign sharp.",
+    image: "/images/pillars/technology.webp",
+    icon: "spark",
   },
-];
+] as const;
 
 export const services = [
   {
