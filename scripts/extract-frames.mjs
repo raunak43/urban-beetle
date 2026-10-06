@@ -25,10 +25,8 @@ const variants = [
 
 // Source frame numbers (24fps) used as standalone beetle images.
 const stills = {
-  forming: 40, // beetle assembling from gold dust
-  profile: 72, // clean side view
-  wings: 86, // wings opening, front view
-  landed: 239, // final pose on the plinth
+  profile: 72, // clean side view (About)
+  landed: 239, // final pose on the plinth (CTA, social share image)
 };
 
 // Box (in source-video pixels) containing the generator's small corner logo, which is painted out
