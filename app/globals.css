@@ -185,13 +185,14 @@ em {
   font-style: normal;
 }
 
-/* Masked words (see <Words>). Gold serif italic for emphasised words. */
+/* Masked words (see <Words>). Gold serif italic for emphasised words. The mask reaches below the
+   line so descenders (g, y, p) aren't cut off. */
 .sw {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  padding-bottom: 0.1em;
-  margin-bottom: -0.1em;
+  padding-bottom: 0.22em;
+  margin-bottom: -0.22em;
 }
 
 .sw > span {
@@ -207,7 +208,11 @@ em {
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.01em;
+  /* The gold is painted through the letters, so the box must reach the bottom of the serif's deep
+     descenders (up to 0.26em below the baseline, while tight line heights end the box at 0.08–0.14em). */
   padding-right: 0.06em;
+  padding-bottom: 0.22em;
+  margin-bottom: -0.22em;
   background: var(--gold-grad);
   background-size: 200% 100%;
   -webkit-background-clip: text;

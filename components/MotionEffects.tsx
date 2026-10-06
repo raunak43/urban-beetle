@@ -40,7 +40,7 @@ export default function MotionEffects() {
 
       all("[data-split]").forEach((el) => {
         gsap.from(el.querySelectorAll(".sw > span"), {
-          yPercent: 115,
+          yPercent: 140, // starts fully below its mask, which reaches under the line for descenders
           rotate: 4,
           duration: 1.3,
           stagger: 0.04,
