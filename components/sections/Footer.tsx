@@ -1,5 +1,6 @@
 import BeetleMark from "../BeetleMark";
-import { external, nav, phoneHref, services, site } from "@/lib/content";
+import SocialLink from "../SocialLink";
+import { nav, phoneHref, services, site } from "@/lib/content";
 
 export default function Footer() {
   return (
@@ -31,9 +32,7 @@ export default function Footer() {
           <div>
             <h3>Connect</h3>
             {site.socials.map((s) => (
-              <a key={s.label} href={s.href} {...external}>
-                {s.label}
-              </a>
+              <SocialLink key={s.label} {...s} />
             ))}
             <a href={`mailto:${site.generalEmail}`}>{site.generalEmail}</a>
             <a href={phoneHref}>{site.phone}</a>

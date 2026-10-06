@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import BeetleMark from "./BeetleMark";
-import { external, nav, phoneHref, site } from "@/lib/content";
+import SocialLink from "./SocialLink";
+import { nav, phoneHref, site } from "@/lib/content";
 import { getLenis, loader } from "@/lib/motion";
 import { pad2 } from "./Text";
 
@@ -75,8 +76,9 @@ export default function Nav() {
             </a>
           ))}
         </nav>
-        <a href="/enquiry" className="btn btn--small nav__cta" data-magnetic="0.25">
-          <span>Start a project</span>
+        <a href="/enquiry" className="btn btn--small btn--gold nav__cta" data-magnetic="0.25">
+          <span className="nav__cta-long">Start a project</span>
+          <span className="nav__cta-short">Enquire</span>
         </a>
         <button
           type="button"
@@ -108,9 +110,7 @@ export default function Nav() {
           <a href={phoneHref}>{site.phone}</a>
           <div className="menu__socials">
             {site.socials.map((s) => (
-              <a key={s.label} href={s.href} {...external}>
-                {s.label}
-              </a>
+              <SocialLink key={s.label} {...s} />
             ))}
           </div>
         </div>

@@ -304,6 +304,26 @@ em {
   font-size: 11.5px;
 }
 
+/* Social profile links: the network's name followed by its logo in gold (see <SocialLink>). */
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.social-link__icon {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  fill: var(--gold);
+  transition: fill 0.3s, transform 0.5s var(--ease);
+}
+
+.social-link:hover .social-link__icon {
+  fill: var(--gold-light);
+  transform: scale(1.12);
+}
+
 .link-arrow {
   position: relative;
   display: inline-flex;
@@ -705,6 +725,20 @@ em {
 
 .nav__link:hover span {
   transform: translateY(-100%);
+}
+
+.nav__cta {
+  transition: color 0.5s var(--ease), border-color 0.5s var(--ease), opacity 0.4s, visibility 0.4s;
+}
+
+/* The menu has its own call to action. */
+.nav.is-open .nav__cta {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.nav__cta-short {
+  display: none;
 }
 
 .nav__toggle {
@@ -2077,11 +2111,6 @@ em {
   gap: 6px 22px;
 }
 
-.contact__socials span {
-  font-size: 0.8em;
-  color: var(--gold);
-}
-
 .contact__card {
   position: relative;
   display: flex;
@@ -2258,6 +2287,10 @@ em {
   transform: translateX(4px);
 }
 
+.footer__cols .social-link {
+  display: flex;
+}
+
 .footer__word {
   display: flex;
   justify-content: center;
@@ -2329,9 +2362,18 @@ em {
 }
 
 @media (max-width: 899px) {
-  .nav__links,
-  .nav__cta {
+  .nav {
+    gap: 14px;
+  }
+
+  .nav__links {
     display: none;
+  }
+
+  /* The call to action stays in the bar on phones and tablets, next to the menu button. */
+  .nav__cta {
+    height: 38px;
+    padding: 0 18px;
   }
 
   .nav__toggle {
@@ -2405,6 +2447,14 @@ em {
   .hero {
     height: 470vh;
     height: 470svh;
+  }
+
+  .nav__cta-long {
+    display: none;
+  }
+
+  .nav__cta-short {
+    display: inline;
   }
 
   /* On phones the video sits as a band in the middle; copy lives above and below it. */
@@ -2541,6 +2591,14 @@ em {
 
   .grain {
     animation: none;
+  }
+}
+
+/* Small phones: tighten the wordmark so it stays on one line beside the call to action. */
+@media (max-width: 389px) {
+  .nav__word {
+    font-size: 12px;
+    letter-spacing: 0.22em;
   }
 }
 

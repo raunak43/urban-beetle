@@ -1,4 +1,5 @@
-import { external, phoneHref, site } from "@/lib/content";
+import { phoneHref, site } from "@/lib/content";
+import SocialLink from "../SocialLink";
 import { Eyebrow, Words } from "../Text";
 
 export default function Contact() {
@@ -34,9 +35,7 @@ export default function Contact() {
               <dt>Follow</dt>
               <dd className="contact__socials">
                 {site.socials.map((s) => (
-                  <a key={s.label} href={s.href} {...external}>
-                    {s.label} <span aria-hidden="true">↗</span>
-                  </a>
+                  <SocialLink key={s.label} {...s} />
                 ))}
               </dd>
             </div>
