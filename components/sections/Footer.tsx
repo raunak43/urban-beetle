@@ -1,5 +1,6 @@
+import type { CSSProperties } from "react";
 import BeetleMark from "../BeetleMark";
-import SocialLink from "../SocialLink";
+import IconLink from "../IconLink";
 import { nav, phoneHref, services, site } from "@/lib/content";
 
 export default function Footer() {
@@ -32,20 +33,27 @@ export default function Footer() {
           <div>
             <h3>Connect</h3>
             {site.socials.map((s) => (
-              <SocialLink key={s.label} {...s} />
+              <IconLink key={s.label} href={s.href} icon={s.label}>
+                {s.label}
+              </IconLink>
             ))}
-            <a href={`mailto:${site.generalEmail}`}>{site.generalEmail}</a>
-            <a href={phoneHref}>{site.phone}</a>
+            <IconLink href={`mailto:${site.generalEmail}`} icon="mail">
+              {site.generalEmail}
+            </IconLink>
+            <IconLink href={phoneHref} icon="phone">
+              {site.phone}
+            </IconLink>
           </div>
         </div>
       </div>
 
+      {/* "URBAN" upright and "BEETLE" in italic, letter by letter so each can rise in and catch the light. */}
       <p className="footer__word" aria-hidden="true" data-split="">
         {Array.from("URBAN BEETLE").map((c, i) =>
           c === " " ? (
             <span key={i} className="footer__gap" />
           ) : (
-            <span key={i} className="sw">
+            <span key={i} className={i > 5 ? "sw is-italic" : "sw"} style={{ "--i": i } as CSSProperties}>
               <span>{c}</span>
             </span>
           ),

@@ -47,6 +47,8 @@ body {
   font-family: var(--sans);
   font-size: 16px;
   line-height: 1.6;
+  /* Bodoni Moda comes with optical sizes for the footer wordmark only; elsewhere it keeps its usual cut. */
+  font-optical-sizing: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
@@ -304,14 +306,14 @@ em {
   font-size: 11.5px;
 }
 
-/* Social profile links: the network's name followed by its logo in gold (see <SocialLink>). */
-.social-link {
+/* Contact and social links: the text followed by its glyph in gold (see <IconLink>). */
+.icon-link {
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
 }
 
-.social-link__icon {
+.icon-link__icon {
   flex: none;
   width: 1.1em;
   height: 1.1em;
@@ -319,7 +321,7 @@ em {
   transition: fill 0.3s, transform 0.5s var(--ease);
 }
 
-.social-link:hover .social-link__icon {
+.icon-link:hover .icon-link__icon {
   fill: var(--gold-light);
   transform: scale(1.12);
 }
@@ -2287,31 +2289,59 @@ em {
   transform: translateX(4px);
 }
 
-.footer__cols .social-link {
+.footer__cols .icon-link {
   display: flex;
 }
 
+/* The closing wordmark: Bodoni Moda in its display cut (optical size follows the font size, so the
+   hairlines stay fine on large screens and sturdy on phones), cast in gold. */
 .footer__word {
   display: flex;
   justify-content: center;
   margin: clamp(60px, 8vw, 120px) 0 0;
   padding-inline: 2vw;
-  font-size: 13.4vw;
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.055em;
+  font-family: var(--serif);
+  font-size: 12.6vw;
+  font-weight: 500;
+  font-optical-sizing: auto;
+  line-height: 0.9;
   white-space: nowrap;
 }
 
 .footer__word .sw > span {
-  background: var(--gold-metal);
+  background:
+    linear-gradient(110deg, transparent 38%, rgba(255, 244, 214, 0.9) 50%, transparent 62%) 160% 0 / 300% 100% no-repeat,
+    var(--gold-metal);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
+.footer__word .is-italic > span {
+  font-style: italic;
+}
+
+/* Now and then a glint of light runs along the letters (desktop only; phones keep it still). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .footer__word .sw > span {
+    animation: footer-glint 9s var(--ease) infinite;
+    animation-delay: calc(var(--i) * 90ms);
+  }
+}
+
+@keyframes footer-glint {
+  0%,
+  60% {
+    background-position: 160% 0, 0 0;
+  }
+  85%,
+  100% {
+    background-position: -60% 0, 0 0;
+  }
+}
+
 .footer__gap {
-  width: 0.22em;
+  width: 0.25em;
 }
 
 .footer__bottom {

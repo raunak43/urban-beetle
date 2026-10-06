@@ -5,7 +5,14 @@ import { site } from "@/lib/content";
 import "./globals.css";
 
 const sans = Inter_Tight({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const serif = Bodoni_Moda({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-serif", display: "swap" });
+// The optical-size axis gives the footer wordmark Bodoni's fine display hairlines (see .footer__word).
+const serif = Bodoni_Moda({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-serif",
+  display: "swap",
+});
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 // Absolute base for social-share image URLs; Vercel provides the production domain automatically.

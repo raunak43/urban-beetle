@@ -1,5 +1,5 @@
 import { phoneHref, site } from "@/lib/content";
-import SocialLink from "../SocialLink";
+import IconLink from "../IconLink";
 import { Eyebrow, Words } from "../Text";
 
 export default function Contact() {
@@ -18,13 +18,17 @@ export default function Contact() {
             <div>
               <dt>Email</dt>
               <dd>
-                <a href={`mailto:${site.generalEmail}`}>{site.generalEmail}</a>
+                <IconLink href={`mailto:${site.generalEmail}`} icon="mail">
+                  {site.generalEmail}
+                </IconLink>
               </dd>
             </div>
             <div>
               <dt>Phone</dt>
               <dd>
-                <a href={phoneHref}>{site.phone}</a>
+                <IconLink href={phoneHref} icon="phone">
+                  {site.phone}
+                </IconLink>
               </dd>
             </div>
             <div>
@@ -35,7 +39,9 @@ export default function Contact() {
               <dt>Follow</dt>
               <dd className="contact__socials">
                 {site.socials.map((s) => (
-                  <SocialLink key={s.label} {...s} />
+                  <IconLink key={s.label} href={s.href} icon={s.label}>
+                    {s.label}
+                  </IconLink>
                 ))}
               </dd>
             </div>

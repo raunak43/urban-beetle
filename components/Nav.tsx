@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import BeetleMark from "./BeetleMark";
-import SocialLink from "./SocialLink";
+import IconLink from "./IconLink";
 import { nav, phoneHref, site } from "@/lib/content";
 import { getLenis, loader } from "@/lib/motion";
 import { pad2 } from "./Text";
@@ -106,11 +106,17 @@ export default function Nav() {
           <a href="/enquiry" className="btn btn--gold menu__cta">
             <span>Start a project →</span>
           </a>
-          <a href={`mailto:${site.email}`}>{site.email}</a>
-          <a href={phoneHref}>{site.phone}</a>
+          <IconLink href={`mailto:${site.email}`} icon="mail">
+            {site.email}
+          </IconLink>
+          <IconLink href={phoneHref} icon="phone">
+            {site.phone}
+          </IconLink>
           <div className="menu__socials">
             {site.socials.map((s) => (
-              <SocialLink key={s.label} {...s} />
+              <IconLink key={s.label} href={s.href} icon={s.label}>
+                {s.label}
+              </IconLink>
             ))}
           </div>
         </div>
