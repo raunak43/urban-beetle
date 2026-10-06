@@ -1767,75 +1767,6 @@ em {
   font-size: 1.05rem;
 }
 
-/* ---------- Results ---------- */
-
-.results {
-  overflow: hidden;
-}
-
-.results__beetle {
-  position: absolute;
-  top: 6%;
-  right: -12%;
-  width: min(1100px, 80vw);
-  opacity: 0.28;
-  pointer-events: none;
-}
-
-.results__beetle img {
-  width: 100%;
-  mix-blend-mode: lighten;
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, transparent 75%);
-  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 40%, transparent 75%);
-}
-
-.results__grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin: 0;
-  border-top: 1px solid var(--line);
-}
-
-.stat {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  gap: 14px;
-  padding: 36px 24px 0 0;
-}
-
-.stat + .stat {
-  padding-left: 24px;
-  border-left: 1px solid var(--line);
-}
-
-.stat dd {
-  margin: 0;
-  font-size: clamp(3.4rem, 7vw, 7.6rem);
-  font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -0.055em;
-  font-variant-numeric: tabular-nums;
-  background: var(--gold-metal);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.stat__suffix {
-  font-size: 0.55em;
-  margin-left: 0.04em;
-}
-
-.stat dt {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 /* ---------- Testimonials ---------- */
 
 .voices__stage {
@@ -2376,16 +2307,6 @@ em {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .results__grid {
-    grid-template-columns: repeat(2, 1fr);
-    row-gap: 40px;
-  }
-
-  .stat:nth-child(3) {
-    padding-left: 0;
-    border-left: 0;
-  }
-
   .service {
     grid-template-columns: 56px minmax(0, 1fr) minmax(0, 300px) 32px;
   }
@@ -2574,22 +2495,6 @@ em {
   .traits li {
     grid-template-columns: 1fr;
     gap: 4px;
-  }
-
-  .results__grid {
-    row-gap: 32px;
-  }
-
-  .stat {
-    padding: 28px 12px 0 0;
-  }
-
-  .stat + .stat {
-    padding-left: 12px;
-  }
-
-  .stat dd {
-    font-size: clamp(2.6rem, 13vw, 3.6rem);
   }
 
   .voices__controls {

@@ -9,7 +9,6 @@ import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion } from "@/li
 //   data-scrub-words                      words brighten as the reader scrolls through
 //   data-parallax="0.15"                  drifts against the scroll
 //   data-clip                             wipes open from the bottom
-//   data-count="120"                      number counts up once visible
 // plus the top scroll-progress line and the pointer glow on .glow-card elements.
 export default function MotionEffects() {
   useEffect(() => {
@@ -91,27 +90,6 @@ export default function MotionEffects() {
       });
     });
 
-    // Counters run even with reduced motion (they just jump straight to the value).
-    const counters = gsap.utils.toArray<HTMLElement>("[data-count]").map((el) => {
-      const target = parseFloat(el.dataset.count || "0");
-      const obj = { v: 0 };
-      el.textContent = reduced ? String(target) : "0";
-      return ScrollTrigger.create({
-        trigger: el,
-        start: "top 90%",
-        once: true,
-        onEnter: () => {
-          if (reduced) return;
-          gsap.to(obj, {
-            v: target,
-            duration: 2.2,
-            ease: "power3.out",
-            onUpdate: () => (el.textContent = String(Math.round(obj.v))),
-          });
-        },
-      });
-    });
-
     // Gold light that follows the pointer across cards.
     const onPointer = (e: PointerEvent) => {
       const card = (e.target as HTMLElement).closest<HTMLElement>(".glow-card");
@@ -132,7 +110,6 @@ export default function MotionEffects() {
 
     return () => {
       document.removeEventListener("pointermove", onPointer);
-      counters.forEach((st) => st.kill());
       ctx.revert();
     };
   }, []);

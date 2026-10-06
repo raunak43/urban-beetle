@@ -11,7 +11,6 @@ import Contact from "@/components/sections/Contact";
 import CTA from "@/components/sections/CTA";
 import Footer from "@/components/sections/Footer";
 import Process from "@/components/sections/Process";
-import Results from "@/components/sections/Results";
 import Services from "@/components/sections/Services";
 import Statement from "@/components/sections/Statement";
 import Testimonials from "@/components/sections/Testimonials";
@@ -41,7 +40,6 @@ export default function Home() {
         <Why />
         <About />
         <Process />
-        <Results />
         <Testimonials />
         <CTA />
         <Contact />

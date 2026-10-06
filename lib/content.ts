@@ -157,14 +157,6 @@ export const process = [
   },
 ];
 
-// PLACEHOLDER: replace with the agency's real numbers.
-export const results = [
-  { value: 120, suffix: "+", label: "Brands moved" },
-  { value: 500, suffix: "+", label: "Campaigns launched" },
-  { value: 40, suffix: "M+", label: "Impressions generated" },
-  { value: 6, suffix: "", label: "Years of momentum" },
-];
-
 // PLACEHOLDER: these quotes are sample copy. Replace with real, approved client testimonials.
 export const testimonials = [
   {
