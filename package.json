@@ -9,7 +9,10 @@
     "frames": "node scripts/extract-frames.mjs",
     "pillars": "node scripts/pillar-images.mjs",
     "telegram:chat-id": "node scripts/telegram.mjs chat-id",
-    "telegram:test": "node scripts/telegram.mjs test"
+    "telegram:test": "node scripts/telegram.mjs test",
+    "whatsapp:template": "node scripts/whatsapp.mjs template",
+    "whatsapp:status": "node scripts/whatsapp.mjs status",
+    "whatsapp:test": "node scripts/whatsapp.mjs test"
   },
   "dependencies": {
     "gsap": "^3.15.0",

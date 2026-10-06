@@ -1,0 +1,24 @@
+{
+  "name": "new_enquiry_alert",
+  "language": "en",
+  "category": "UTILITY",
+  "header": "New website enquiry",
+  "body": "A new client enquiry ({{1}}) has come in through the Urban Beetle website.\n\n*Name:* {{2}}\n*Company:* {{3}}\n*Phone:* {{4}}\n*Email:* {{5}}\n*City:* {{6}}\n*Services:* {{7}}\n*Budget:* {{8}}\n*Wants to start:* {{9}}\n\n*Goals:* {{10}}\n\nTap the button below to chat with the client on WhatsApp. Full details are in Telegram and Supabase.",
+  "footer": "Urban Beetle website alerts",
+  "button": { "text": "Chat with client", "url": "https://urbanbeetle.com/chat/{{1}}" },
+  "example": {
+    "body": [
+      "UB-1A2B3C4D",
+      "Priya Sharma",
+      "Sunrise Bakery",
+      "+91 98765 43210",
+      "priya@example.com",
+      "Pune",
+      "Branding, Social Media Management",
+      "₹50,000 – ₹1,00,000",
+      "Within 1 month",
+      "Open a second outlet and grow online orders through Instagram."
+    ],
+    "button": "919876543210"
+  }
+}

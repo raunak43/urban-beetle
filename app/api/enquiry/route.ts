@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { after, type NextRequest } from "next/server";
 import { normaliseUrl, sanitiseEnquiry, validateEnquiry, type EnquiryInput } from "@/lib/enquiry";
 import { formatEnquiryMessage, sendTelegram } from "@/lib/telegram";
+import { sendWhatsApp } from "@/lib/whatsapp";
 
 const MAX_BODY_BYTES = 40_000;
 const MIN_FILL_MS = 4_000; // humans can't complete this form faster; bots can
@@ -93,8 +94,11 @@ export async function POST(request: NextRequest) {
 
   const reference = `UB-${result.id.slice(0, 8).toUpperCase()}`;
 
-  // Alert the team after responding, so the visitor never waits on Telegram.
-  if (!result.duplicate) after(() => sendTelegram(formatEnquiryMessage(record, reference, supabaseUrl)));
+  // Alert the team after responding, so the visitor never waits on Telegram or WhatsApp.
+  if (!result.duplicate)
+    after(() =>
+      Promise.all([sendTelegram(formatEnquiryMessage(record, reference, supabaseUrl)), sendWhatsApp(record, reference)]),
+    );
 
   return Response.json({ ok: true, reference });
 }

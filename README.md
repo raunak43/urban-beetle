@@ -48,6 +48,19 @@ Copy `.env.example` to `.env.local` for local development, and add the same vari
 
 If Telegram is not configured or fails, enquiries are still stored. Alerts never block a submission.
 
+### WhatsApp alerts
+
+Each new enquiry is also sent to the business WhatsApp (`WHATSAPP_TO`) as a short alert with a **Chat with client** button. Meta doesn't allow WhatsApp links in buttons, so the button opens `urbanbeetle.com/chat/<number>`, which forwards to `wa.me` (see `next.config.ts`). WhatsApp won't let a number message itself, so the alerts come from Meta's free test number, which may send unlimited messages to up to 5 verified numbers.
+
+1. At [developers.facebook.com](https://developers.facebook.com/apps), create an app with the **Connect with customers through WhatsApp** use case.
+2. On its **Quickstart / API Setup** page, add the business number as a **To** recipient and enter the code WhatsApp sends to it. Note the test number's **Phone number ID** and the **WhatsApp Business Account ID**.
+3. In [Business Settings → System users](https://business.facebook.com/settings/system-users), add an admin system user, assign it the app and the WhatsApp account (full control), and generate a token that never expires with `business_management`, `whatsapp_business_management` and `whatsapp_business_messaging`.
+4. Put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID` and `WHATSAPP_TO` (digits with country code, e.g. `918356940351`) in `.env.local`.
+5. Run `npm run whatsapp:template`, wait until `npm run whatsapp:status` says `APPROVED`, then run `npm run whatsapp:test`.
+6. Add `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` and `WHATSAPP_TO` to Vercel and redeploy.
+
+The alert's wording lives in `lib/whatsapp-template.json`. Meta must approve any change, so give an edited template a new `name` and submit it again. To send from your own second number later, register it in the same app, then repeat steps 4–6 with its IDs (templates don't carry over from the test number).
+
 ## Changing the hero video
 
 The hero plays the video as an image sequence (smoother than scrubbing a video file). To use a new video:
