@@ -4,6 +4,7 @@ import { normaliseUrl, sanitiseEnquiry, validateEnquiry, type EnquiryInput } fro
 import { PHOTO_SLOTS, photoField, uploadedPhotoProblem, type EnquiryPhoto, type PhotoSlot } from "@/lib/photos";
 import { formatEnquiryMessage, sendTelegram, sendTelegramPhotos } from "@/lib/telegram";
 import { sendWhatsApp, sendWhatsAppPhotos } from "@/lib/whatsapp";
+import { canEmail, sendConfirmationEmail } from "@/lib/email";
 
 // The photos go to Telegram and WhatsApp after the response, within this many seconds.
 export const maxDuration = 60;
@@ -137,8 +138,8 @@ export async function POST(request: NextRequest) {
 
   const reference = `UB-${result.id.slice(0, 8).toUpperCase()}`;
 
-  // Alert the team after responding, so the visitor never waits on Telegram or WhatsApp.
-  // On both, the photos follow the alert (on Telegram as a reply to it).
+  // Alert the team and email the client after responding, so the visitor never waits on Telegram,
+  // WhatsApp or email. On both chat apps, the photos follow the alert (on Telegram as a reply to it).
   if (!result.duplicate)
     after(() =>
       Promise.all([
@@ -146,8 +147,10 @@ export async function POST(request: NextRequest) {
           sendTelegramPhotos(photos, record, reference, messageId),
         ),
         sendWhatsApp(record, reference).then(() => sendWhatsAppPhotos(photos, record, reference)),
+        sendConfirmationEmail(record, reference, photos),
       ]),
     );
 
-  return Response.json({ ok: true, reference });
+  // confirmationEmail: whether the client is being emailed, so the success screen never promises one that isn't sent.
+  return Response.json({ ok: true, reference, confirmationEmail: canEmail() });
 }

@@ -37,6 +37,10 @@ Every "Start a project" button leads to `/enquiry`. Submissions go to `app/api/e
 
 Step 05 of the form lets clients add one photo of the outside of their business and up to three of the inside (optional). Photos must be at least **800 × 600 pixels** (either way round) and up to 30 MB each; panoramas wider than 4:1 are refused. Vercel rejects requests over 4.5 MB, so the visitor's browser shrinks each photo before upload: upright, at most 2048 px and 1 MB as a JPEG, with camera details such as GPS location removed. The API checks every photo again, then posts them to the Telegram group as an album replying to the enquiry alert (as image files if Telegram refuses them as photos), and to WhatsApp as one message per photo after the alert. Photos are not stored in Supabase, so the copies in Telegram and WhatsApp are the only ones. The rules live in `lib/photos.ts`.
 
+### Confirmation email
+
+Every client who submits the form gets a branded confirmation email from **support@urbanbeetle.com**. It thanks them, promises a reply within 24 hours, summarises their enquiry and ends with the signature. The email is sent through the Titan mailbox over SMTP (`smtp.titan.email`, port 465), so replies land in that inbox. Set `SMTP_PASSWORD` to the mailbox's password in `.env.local` and on Vercel (as a sensitive variable), then redeploy. Without it, enquiries work as before, no email is sent, and the thank-you screen doesn't mention one. The wording and signature live in `lib/email.ts`.
+
 ### Environment variables
 
 Copy `.env.example` to `.env.local` for local development, and add the same variables in Vercel → Project → Settings → Environment Variables before deploying.

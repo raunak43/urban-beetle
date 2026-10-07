@@ -974,6 +974,21 @@
   animation: eq-rise-in 1s var(--ease) 1.15s both;
 }
 
+.eq-success__note {
+  max-width: 46ch;
+  margin: -16px auto 40px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  animation: eq-rise-in 1s var(--ease) 1.22s both;
+}
+
+.eq-success__note strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
 .eq-success__home {
   animation: eq-rise-in 1s var(--ease) 1.3s both, sheen 6s linear infinite;
 }

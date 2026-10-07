@@ -75,6 +75,7 @@ export default function EnquiryForm() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
+  const [confirmationTo, setConfirmationTo] = useState<string | null>(null);
   const [uploaded, setUploaded] = useState<number | null>(null);
   const [active, setActive] = useState(SECTIONS[0].id);
   const photos = usePhotos();
@@ -202,7 +203,7 @@ export default function EnquiryForm() {
       for (const { slot, blob } of photos.ready) body.set(photoField(slot), blob, `${slot}.jpg`);
       const res = await postEnquiry(body, photos.ready.length ? setUploaded : undefined);
       const data = res.data as
-        | { ok: true; reference: string }
+        | { ok: true; reference: string; confirmationEmail?: boolean }
         | { ok: false; error: string; fieldErrors?: FieldErrors; photoErrors?: Record<string, string> }
         | null;
 
@@ -211,6 +212,7 @@ export default function EnquiryForm() {
         try {
           localStorage.removeItem(DRAFT_KEY);
         } catch {}
+        setConfirmationTo(data.confirmationEmail ? values.email.trim().toLowerCase() : null);
         setReference(data.reference);
         return;
       }
@@ -565,14 +567,15 @@ export default function EnquiryForm() {
                 )}
               </button>
               <p className="eq-submit__note">
-                Your details are kept private and used only to respond to your enquiry.
+                Our team will get back to you within 24 hours. Your details are kept private and used only to respond to
+                your enquiry.
               </p>
             </div>
           </div>
         </form>
       </div>
 
-      {reference && <SuccessScreen reference={reference} />}
+      {reference && <SuccessScreen reference={reference} email={confirmationTo} />}
     </>
   );
 }

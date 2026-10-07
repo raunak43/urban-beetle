@@ -4,8 +4,9 @@ import { useEffect, useRef } from "react";
 import BeetleMark from "../BeetleMark";
 import Particles from "../Particles";
 
-// Shown only after the server confirms the enquiry is stored in Supabase.
-export default function SuccessScreen({ reference }: { reference: string }) {
+// Shown only after the server confirms the enquiry is stored in Supabase. `email` is set when the
+// server is sending the client a confirmation email.
+export default function SuccessScreen({ reference, email }: { reference: string; email: string | null }) {
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -44,6 +45,12 @@ export default function SuccessScreen({ reference }: { reference: string }) {
         <p className="eq-success__text">
           Thank you for contacting Urban Beetle. Our team has received your enquiry and will contact you within 24 hours.
         </p>
+        {email && (
+          <p className="eq-success__note">
+            A confirmation email is on its way to <strong>{email}</strong>. If you don&apos;t see it in a few minutes,
+            please check your spam folder.
+          </p>
+        )}
         <a href="/" className="btn btn--gold eq-success__home" data-magnetic="0.25">
           <span>Back to home</span>
         </a>
