@@ -1,0 +1,10 @@
+{
+  "name": "enquiry_business_photo",
+  "language": "en",
+  "category": "UTILITY",
+  "body": "Business photo from {{1}}: *{{2}}* view, shared with enquiry {{3}} on the Urban Beetle website.",
+  "footer": "Urban Beetle website alerts",
+  "example": {
+    "body": ["Sunrise Bakery (Priya Sharma)", "Outside", "UB-1A2B3C4D"]
+  }
+}

@@ -1,9 +1,12 @@
 import "server-only";
 import { BUDGETS, SERVICES, START_TIMELINES, labelOf, type EnquiryInput } from "./enquiry";
+import { photoLabel, type EnquiryPhoto } from "./photos";
+import photoTemplate from "./whatsapp-photo-template.json";
 import template from "./whatsapp-template.json";
 
 // WhatsApp only lets a business start a chat with a template Meta has approved, so each alert fills in
-// lib/whatsapp-template.json (submitted for approval with `npm run whatsapp:template`).
+// lib/whatsapp-template.json, and each business photo lib/whatsapp-photo-template.json (submitted for
+// approval with `npm run whatsapp:template` and `npm run whatsapp:photo-template`).
 const GRAPH = "https://graph.facebook.com/v23.0";
 const BODY_LIMIT = 1024; // characters, once the values are filled in
 
@@ -83,4 +86,68 @@ export async function sendWhatsApp(e: EnquiryInput, reference: string): Promise<
     console.error("[enquiry] WhatsApp alert error:", err);
     return false;
   }
+}
+
+// A template carries a single image, so each business photo is its own message, sent after the alert
+// and in order (outside view first). Best effort, like the alert.
+export async function sendWhatsAppPhotos(photos: EnquiryPhoto[], e: EnquiryInput, reference: string): Promise<boolean> {
+  const token = process.env.WHATSAPP_TOKEN;
+  const from = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const to = process.env.WHATSAPP_TO;
+  if (!photos.length || !token || !from || !to) return false;
+  const who = flat(`${e.company_name} (${e.full_name})`, 160);
+  try {
+    const ids = await Promise.all(photos.map((p) => uploadPhoto(p, reference, token, from)));
+    for (const [i, photo] of photos.entries()) {
+      const res = await fetch(`${GRAPH}/${from}/messages`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          to,
+          type: "template",
+          template: {
+            name: photoTemplate.name,
+            language: { code: photoTemplate.language },
+            components: [
+              { type: "header", parameters: [{ type: "image", image: { id: ids[i] } }] },
+              {
+                type: "body",
+                parameters: [who, photoLabel(photo.slot), reference].map((text) => ({ type: "text", text })),
+              },
+            ],
+          },
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: { code?: number; message?: string } };
+        // The rest would fail the same way (e.g. while Meta is still reviewing the template).
+        console.error("[enquiry] WhatsApp photo failed:", res.status, body.error?.code ?? "", body.error?.message ?? "");
+        return false;
+      }
+    }
+    return true;
+  } catch (err) {
+    console.error("[enquiry] WhatsApp photo error:", err);
+    return false;
+  }
+}
+
+// Uploads a photo to WhatsApp and returns its media ID (WhatsApp keeps it for 30 days).
+async function uploadPhoto(photo: EnquiryPhoto, reference: string, token: string, from: string) {
+  const form = new FormData();
+  form.set("messaging_product", "whatsapp");
+  form.set("type", "image/jpeg");
+  form.set("file", new Blob([photo.file], { type: "image/jpeg" }), `${reference}-${photo.slot.replace("_", "-")}.jpg`);
+  const res = await fetch(`${GRAPH}/${from}/media`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+    signal: AbortSignal.timeout(20_000),
+  });
+  const body = (await res.json().catch(() => ({}))) as { id?: string; error?: { code?: number; message?: string } };
+  if (!res.ok || !body.id)
+    throw new Error(`photo upload failed: ${res.status} ${body.error?.code ?? ""} ${body.error?.message ?? ""}`);
+  return body.id;
 }

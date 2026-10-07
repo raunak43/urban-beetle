@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
 import { after, type NextRequest } from "next/server";
 import { normaliseUrl, sanitiseEnquiry, validateEnquiry, type EnquiryInput } from "@/lib/enquiry";
-import { PHOTO_SLOTS, photoField, uploadedPhotoProblem, type PhotoSlot } from "@/lib/photos";
-import { formatEnquiryMessage, sendTelegram, sendTelegramPhotos, type EnquiryPhoto } from "@/lib/telegram";
-import { sendWhatsApp } from "@/lib/whatsapp";
+import { PHOTO_SLOTS, photoField, uploadedPhotoProblem, type EnquiryPhoto, type PhotoSlot } from "@/lib/photos";
+import { formatEnquiryMessage, sendTelegram, sendTelegramPhotos } from "@/lib/telegram";
+import { sendWhatsApp, sendWhatsAppPhotos } from "@/lib/whatsapp";
 
-// The photos go to Telegram after the response, within this many seconds.
+// The photos go to Telegram and WhatsApp after the response, within this many seconds.
 export const maxDuration = 60;
 
 const MAX_BODY_BYTES = 40_000;
@@ -138,14 +138,14 @@ export async function POST(request: NextRequest) {
   const reference = `UB-${result.id.slice(0, 8).toUpperCase()}`;
 
   // Alert the team after responding, so the visitor never waits on Telegram or WhatsApp.
-  // The photos follow the Telegram alert as a reply to it.
+  // On both, the photos follow the alert (on Telegram as a reply to it).
   if (!result.duplicate)
     after(() =>
       Promise.all([
         sendTelegram(formatEnquiryMessage(record, reference, supabaseUrl, photos)).then((messageId) =>
           sendTelegramPhotos(photos, record, reference, messageId),
         ),
-        sendWhatsApp(record, reference),
+        sendWhatsApp(record, reference).then(() => sendWhatsAppPhotos(photos, record, reference)),
       ]),
     );
 

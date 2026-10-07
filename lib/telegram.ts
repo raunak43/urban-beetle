@@ -8,7 +8,7 @@ import {
   labelOf,
   type EnquiryInput,
 } from "./enquiry";
-import type { PhotoSlot } from "./photos";
+import type { EnquiryPhoto } from "./photos";
 
 // Telegram's hard limit is 4096 characters per message; long answers are trimmed (the full text is in Supabase).
 const FIELD_LIMIT = 600;
@@ -16,9 +16,6 @@ const FIELD_LIMIT = 600;
 const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const clip = (s: string) => (s.length > FIELD_LIMIT ? `${s.slice(0, FIELD_LIMIT)}… (continued in Supabase)` : s);
 const line = (label: string, value: string) => (value ? `<b>${label}:</b> ${escape(clip(value))}\n` : "");
-
-// A business photo from the form, outside view first.
-export type EnquiryPhoto = { slot: PhotoSlot; file: Blob };
 
 // e.g. "Outside + 3 inside"
 function photoSummary(photos: EnquiryPhoto[]) {

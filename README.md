@@ -35,7 +35,7 @@ Every "Start a project" button leads to `/enquiry`. Submissions go to `app/api/e
 
 ### Business photos
 
-Step 05 of the form lets clients add one photo of the outside of their business and up to three of the inside (optional). Photos must be at least **800 × 600 pixels** (either way round) and up to 30 MB each; panoramas wider than 4:1 are refused. Vercel rejects requests over 4.5 MB, so the visitor's browser shrinks each photo before upload: upright, at most 2048 px and 1 MB as a JPEG, with camera details such as GPS location removed. The API checks every photo again, then posts them to the Telegram group as an album replying to the enquiry alert (as image files if Telegram refuses them as photos). Photos are not stored in Supabase, so Telegram holds the only copy. The rules live in `lib/photos.ts`.
+Step 05 of the form lets clients add one photo of the outside of their business and up to three of the inside (optional). Photos must be at least **800 × 600 pixels** (either way round) and up to 30 MB each; panoramas wider than 4:1 are refused. Vercel rejects requests over 4.5 MB, so the visitor's browser shrinks each photo before upload: upright, at most 2048 px and 1 MB as a JPEG, with camera details such as GPS location removed. The API checks every photo again, then posts them to the Telegram group as an album replying to the enquiry alert (as image files if Telegram refuses them as photos), and to WhatsApp as one message per photo after the alert. Photos are not stored in Supabase, so the copies in Telegram and WhatsApp are the only ones. The rules live in `lib/photos.ts`.
 
 ### Environment variables
 
@@ -54,16 +54,16 @@ If Telegram is not configured or fails, enquiries are still stored. Alerts never
 
 ### WhatsApp alerts
 
-Each new enquiry is also sent to the business WhatsApp (`WHATSAPP_TO`) as a short alert with a **Chat with client** button. Meta doesn't allow WhatsApp links in buttons, so the button opens `urbanbeetle.com/chat/<number>`, which forwards to `wa.me` (see `next.config.ts`). WhatsApp won't let a number message itself, so the alerts come from Meta's free test number, which may send unlimited messages to up to 5 verified numbers.
+Each new enquiry is also sent to the business WhatsApp (`WHATSAPP_TO`) as a short alert with a **Chat with client** button, followed by any business photos (a template holds one image, so each photo is its own message). Meta doesn't allow WhatsApp links in buttons, so the button opens `urbanbeetle.com/chat/<number>`, which forwards to `wa.me` (see `next.config.ts`). WhatsApp won't let a number message itself, so the alerts come from Meta's free test number, which may send unlimited messages to up to 5 verified numbers.
 
 1. At [developers.facebook.com](https://developers.facebook.com/apps), create an app with the **Connect with customers through WhatsApp** use case.
 2. On its **Quickstart / API Setup** page, add the business number as a **To** recipient and enter the code WhatsApp sends to it. Note the test number's **Phone number ID** and the **WhatsApp Business Account ID**.
 3. In [Business Settings → System users](https://business.facebook.com/settings/system-users), add an admin system user, assign it the app and the WhatsApp account (full control), and generate a token that never expires with `business_management`, `whatsapp_business_management` and `whatsapp_business_messaging`.
 4. Put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID` and `WHATSAPP_TO` (digits with country code, e.g. `918356940351`) in `.env.local`.
-5. Run `npm run whatsapp:template`, wait until `npm run whatsapp:status` says `APPROVED`, then run `npm run whatsapp:test`.
+5. Run `npm run whatsapp:template` and `npm run whatsapp:photo-template`, wait until `npm run whatsapp:status` says both are `APPROVED`, then run `npm run whatsapp:test` and `npm run whatsapp:test-photo`. Until the photo template is approved, alerts still arrive and the photos are skipped (the log shows error 132001).
 6. Add `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` and `WHATSAPP_TO` to Vercel and redeploy.
 
-The alert's wording lives in `lib/whatsapp-template.json`. Meta must approve any change, so give an edited template a new `name` and submit it again. To send from your own second number later, register it in the same app, then repeat steps 4–6 with its IDs (templates don't carry over from the test number).
+The alert's wording lives in `lib/whatsapp-template.json`, the photo message's in `lib/whatsapp-photo-template.json`. Meta must approve any change, so give an edited template a new `name` and submit it again. To send from your own second number later, register it in the same app, then repeat steps 4–6 with its IDs (templates don't carry over from the test number).
 
 ## Changing the hero video
 

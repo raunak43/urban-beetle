@@ -10,8 +10,12 @@ export const PHOTO_SLOTS = [
 
 export type PhotoSlot = (typeof PHOTO_SLOTS)[number]["id"];
 
+// A photo the API received and checked, sent on to Telegram and WhatsApp (outside view first).
+export type EnquiryPhoto = { slot: PhotoSlot; file: Blob };
+
 // The form field each photo is uploaded in.
 export const photoField = (slot: PhotoSlot) => `photo_${slot}`;
+export const photoLabel = (slot: PhotoSlot) => PHOTO_SLOTS.find((s) => s.id === slot)?.label ?? "Photo";
 
 // Smallest photo accepted, in either orientation.
 export const PHOTO_MIN_LONG = 800;

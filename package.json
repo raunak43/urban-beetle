@@ -11,8 +11,10 @@
     "telegram:chat-id": "node scripts/telegram.mjs chat-id",
     "telegram:test": "node scripts/telegram.mjs test",
     "whatsapp:template": "node scripts/whatsapp.mjs template",
+    "whatsapp:photo-template": "node scripts/whatsapp.mjs photo-template",
     "whatsapp:status": "node scripts/whatsapp.mjs status",
-    "whatsapp:test": "node scripts/whatsapp.mjs test"
+    "whatsapp:test": "node scripts/whatsapp.mjs test",
+    "whatsapp:test-photo": "node scripts/whatsapp.mjs test-photo"
   },
   "dependencies": {
     "gsap": "^3.15.0",
