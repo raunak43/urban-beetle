@@ -17,6 +17,8 @@ import {
   type Option,
 } from "@/lib/enquiry";
 import { phoneHref, site } from "@/lib/content";
+import { photoField } from "@/lib/photos";
+import PhotoPicker, { usePhotos } from "./PhotoPicker";
 import SuccessScreen from "./SuccessScreen";
 
 const DRAFT_KEY = "ub-enquiry-draft";
@@ -45,6 +47,26 @@ const LABELS: Record<Field, string> = {
 const FIELD_ORDER = SECTIONS.flatMap((s) => s.fields);
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+// XMLHttpRequest rather than fetch, so the button can show how much of the photos has uploaded.
+function postEnquiry(body: FormData, onProgress?: (fraction: number) => void) {
+  return new Promise<{ ok: boolean; data: unknown }>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/enquiry");
+    xhr.timeout = 180_000;
+    if (onProgress) xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () => {
+      let data: unknown = null;
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch {}
+      resolve({ ok: xhr.status >= 200 && xhr.status < 300, data });
+    };
+    xhr.onerror = () => reject(new Error("Network error"));
+    xhr.ontimeout = () => reject(new Error("Timed out"));
+    xhr.send(body);
+  });
+}
+
 export default function EnquiryForm() {
   const [values, setValues] = useState<EnquiryInput>(EMPTY_ENQUIRY);
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
@@ -53,7 +75,9 @@ export default function EnquiryForm() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
+  const [uploaded, setUploaded] = useState<number | null>(null);
   const [active, setActive] = useState(SECTIONS[0].id);
+  const photos = usePhotos();
   const startedAt = useRef(0);
   const inFlight = useRef(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
@@ -121,10 +145,13 @@ export default function EnquiryForm() {
   const touch = (key: Field) => setTouched((t) => (t[key] ? t : { ...t, [key]: true }));
 
   const sectionState = SECTIONS.map((s) => {
-    const filled = s.fields.some((f) => {
-      const v = values[f];
-      return Array.isArray(v) ? v.length > 0 : v.trim() !== "";
-    });
+    const filled =
+      s.id === "photos"
+        ? photos.ready.length > 0
+        : s.fields.some((f) => {
+            const v = values[f];
+            return Array.isArray(v) ? v.length > 0 : v.trim() !== "";
+          });
     const valid = s.fields.every((f) => !errors[f]);
     return { ...s, done: s.optional ? filled && valid : valid };
   });
@@ -155,22 +182,28 @@ export default function EnquiryForm() {
       focusField(firstInvalid);
       return;
     }
+    if (photos.preparing) {
+      setServerError("Your photos are still being prepared. Please wait a moment, then submit again.");
+      return;
+    }
 
     inFlight.current = true;
     setSubmitting(true);
     try {
-      const res = await fetch("/api/enquiry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const body = new FormData();
+      body.set(
+        "data",
+        JSON.stringify({
           enquiry: values,
           elapsed_ms: Date.now() - startedAt.current,
           company_website: honeypotRef.current?.value ?? "",
         }),
-      });
-      const data = (await res.json().catch(() => null)) as
+      );
+      for (const { slot, blob } of photos.ready) body.set(photoField(slot), blob, `${slot}.jpg`);
+      const res = await postEnquiry(body, photos.ready.length ? setUploaded : undefined);
+      const data = res.data as
         | { ok: true; reference: string }
-        | { ok: false; error: string; fieldErrors?: FieldErrors }
+        | { ok: false; error: string; fieldErrors?: FieldErrors; photoErrors?: Record<string, string> }
         | null;
 
       // Success is only shown once the server confirms the enquiry is stored.
@@ -186,6 +219,7 @@ export default function EnquiryForm() {
         const first = FIELD_ORDER.find((f) => data.fieldErrors?.[f]);
         if (first) focusField(first);
       }
+      if (data && !data.ok && data.photoErrors) photos.reject(data.photoErrors);
       setServerError(
         (data && !data.ok && data.error) || "Something went wrong while sending your enquiry. Please try again.",
       );
@@ -194,6 +228,7 @@ export default function EnquiryForm() {
     } finally {
       inFlight.current = false;
       setSubmitting(false);
+      setUploaded(null);
     }
   };
 
@@ -237,8 +272,8 @@ export default function EnquiryForm() {
           and get back to you within 24 hours.
         </p>
         <ul className="eq-hero__meta eq-rise" style={{ "--d": 5 } as React.CSSProperties}>
-          <li>5 short sections</li>
-          <li>About 4 minutes</li>
+          <li>6 short sections</li>
+          <li>About 5 minutes</li>
           <li>Reply within 24 hours</li>
         </ul>
       </section>
@@ -442,7 +477,16 @@ export default function EnquiryForm() {
             />
           </Section>
 
-          <Section id="extra" index={4} title="Additional information" intro="Optional, but always appreciated.">
+          <Section
+            id="photos"
+            index={4}
+            title="Photos of your business"
+            intro="Optional, but it helps us picture your space before we talk."
+          >
+            <PhotoPicker photos={photos.photos} errors={photos.errors} onPick={photos.pick} onRemove={photos.remove} />
+          </Section>
+
+          <Section id="extra" index={5} title="Additional information" intro="Optional, but always appreciated.">
             <TextArea
               field="additional_information"
               label="Tell us anything else we should know about your project."
@@ -499,13 +543,20 @@ export default function EnquiryForm() {
               <button
                 type="submit"
                 className="btn btn--gold eq-submit__btn"
-                disabled={submitting}
-                aria-busy={submitting}
+                disabled={submitting || photos.preparing}
+                aria-busy={submitting || photos.preparing}
                 data-magnetic="0.2"
               >
                 {submitting ? (
                   <span className="eq-submit__label">
-                    <span className="eq-spinner" aria-hidden="true" /> Submitting…
+                    <span className="eq-spinner" aria-hidden="true" />
+                    {uploaded !== null && uploaded < 1
+                      ? `Uploading photos… ${Math.round(uploaded * 100)}%`
+                      : "Submitting…"}
+                  </span>
+                ) : photos.preparing ? (
+                  <span className="eq-submit__label">
+                    <span className="eq-spinner" aria-hidden="true" /> Preparing photos…
                   </span>
                 ) : (
                   <span className="eq-submit__label">

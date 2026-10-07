@@ -120,6 +120,7 @@ export const MAX_LENGTH: Partial<Record<Field, number>> = {
 };
 
 // Form sections, in order, with the fields each one owns (used for progress and error navigation).
+// "photos" owns no text fields: its uploads live in lib/photos.ts.
 export const SECTIONS: { id: string; title: string; fields: Field[]; optional?: boolean }[] = [
   { id: "about", title: "About you", fields: ["full_name", "company_name", "email", "phone", "city", "website", "social_media"] },
   { id: "needs", title: "What do you need?", fields: ["services_required", "services_other"] },
@@ -129,6 +130,7 @@ export const SECTIONS: { id: string; title: string; fields: Field[]; optional?: 
     fields: ["business_description", "project_goals", "current_challenges", "target_audience"],
   },
   { id: "details", title: "Project information", fields: ["budget", "start_timeline", "project_duration"] },
+  { id: "photos", title: "Business photos", fields: [], optional: true },
   { id: "extra", title: "Anything else", fields: ["additional_information", "referral_source"], optional: true },
 ];
 

@@ -33,6 +33,10 @@ Every "Start a project" button leads to `/enquiry`. Submissions go to `app/api/e
 - **View enquiries:** [Supabase Table Editor](https://supabase.com/dashboard/project/kitkreckzfccjvcxkifg/editor) → `client_enquiries`.
 - **New Supabase project?** Run the file in `supabase/migrations/` in that project's SQL Editor, then update `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
 
+### Business photos
+
+Step 05 of the form lets clients add one photo of the outside of their business and up to three of the inside (optional). Photos must be at least **800 × 600 pixels** (either way round) and up to 30 MB each; panoramas wider than 4:1 are refused. Vercel rejects requests over 4.5 MB, so the visitor's browser shrinks each photo before upload: upright, at most 2048 px and 1 MB as a JPEG, with camera details such as GPS location removed. The API checks every photo again, then posts them to the Telegram group as an album replying to the enquiry alert (as image files if Telegram refuses them as photos). Photos are not stored in Supabase, so Telegram holds the only copy. The rules live in `lib/photos.ts`.
+
 ### Environment variables
 
 Copy `.env.example` to `.env.local` for local development, and add the same variables in Vercel → Project → Settings → Environment Variables before deploying.
@@ -44,7 +48,7 @@ Copy `.env.example` to `.env.local` for local development, and add the same vari
 3. Paste the token into `.env.local` as `TELEGRAM_BOT_TOKEN=...`
 4. Run `npm run telegram:chat-id` and copy the `TELEGRAM_CHAT_ID=...` line it prints into `.env.local`.
 5. Run `npm run telegram:test`. A test message should appear in the group.
-6. Restart `npm run dev`. Every new enquiry is now posted to the group with the client's full details.
+6. Restart `npm run dev`. Every new enquiry is now posted to the group with the client's full details, followed by their business photos.
 
 If Telegram is not configured or fails, enquiries are still stored. Alerts never block a submission.
 

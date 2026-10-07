@@ -1,16 +1,23 @@
 import { createHash } from "node:crypto";
 import { after, type NextRequest } from "next/server";
 import { normaliseUrl, sanitiseEnquiry, validateEnquiry, type EnquiryInput } from "@/lib/enquiry";
-import { formatEnquiryMessage, sendTelegram } from "@/lib/telegram";
+import { PHOTO_SLOTS, photoField, uploadedPhotoProblem, type PhotoSlot } from "@/lib/photos";
+import { formatEnquiryMessage, sendTelegram, sendTelegramPhotos, type EnquiryPhoto } from "@/lib/telegram";
 import { sendWhatsApp } from "@/lib/whatsapp";
 
+// The photos go to Telegram after the response, within this many seconds.
+export const maxDuration = 60;
+
 const MAX_BODY_BYTES = 40_000;
+const MAX_UPLOAD_BYTES = 4_400_000; // answers + four resized photos; Vercel refuses request bodies over 4.5 MB
 const MIN_FILL_MS = 4_000; // humans can't complete this form faster; bots can
 const MAX_LINKS = 6;
 
-type Fail = { ok: false; error: string; fieldErrors?: Record<string, string> };
-const fail = (status: number, error: string, fieldErrors?: Fail["fieldErrors"]) =>
-  Response.json({ ok: false, error, fieldErrors } satisfies Fail, { status });
+type PhotoErrors = Partial<Record<PhotoSlot, string>>;
+type Fail = { ok: false; error: string; fieldErrors?: Record<string, string>; photoErrors?: PhotoErrors };
+const fail = (status: number, error: string, fieldErrors?: Fail["fieldErrors"], photoErrors?: PhotoErrors) =>
+  Response.json({ ok: false, error, fieldErrors, photoErrors } satisfies Fail, { status });
+const unreadable = () => fail(400, "We couldn't read your enquiry. Please try again.");
 
 export async function POST(request: NextRequest) {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -20,20 +27,47 @@ export async function POST(request: NextRequest) {
     return fail(503, "Enquiries are temporarily unavailable. Please email us instead.");
   }
 
-  // Only accept JSON posted from this site.
+  // Only accept enquiries posted from this site: the form sends its answers as JSON in a "data"
+  // field, plus any business photos. Plain JSON (no photos) is still accepted.
   const origin = request.headers.get("origin");
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
   if (origin && URL.parse(origin)?.host !== host) return fail(403, "Request not allowed.");
-  if (!request.headers.get("content-type")?.includes("application/json")) return fail(415, "Unsupported request.");
-  const raw = await request.text();
+  const contentType = request.headers.get("content-type") ?? "";
+  let raw: string;
+  const photos: EnquiryPhoto[] = [];
+  if (contentType.includes("multipart/form-data")) {
+    if (Number(request.headers.get("content-length")) > MAX_UPLOAD_BYTES)
+      return fail(413, "Your photos are too large to send. Please remove one and try again.");
+    let form: FormData;
+    try {
+      form = await request.formData();
+    } catch {
+      return unreadable();
+    }
+    const data = form.getAll("data");
+    if (data.length !== 1 || typeof data[0] !== "string") return unreadable();
+    raw = data[0];
+    for (const [key, value] of form) {
+      if (key === "data") continue;
+      const slot = PHOTO_SLOTS.find((s) => photoField(s.id) === key)?.id;
+      if (!slot || typeof value === "string" || photos.some((p) => p.slot === slot)) return unreadable();
+      photos.push({ slot, file: value });
+    }
+    photos.sort((a, b) => PHOTO_SLOTS.findIndex((s) => s.id === a.slot) - PHOTO_SLOTS.findIndex((s) => s.id === b.slot));
+  } else if (contentType.includes("application/json")) {
+    raw = await request.text();
+  } else {
+    return fail(415, "Unsupported request.");
+  }
   if (raw.length > MAX_BODY_BYTES) return fail(413, "Your enquiry is too long. Please shorten it and try again.");
 
   let body: Record<string, unknown>;
   try {
     body = JSON.parse(raw);
   } catch {
-    return fail(400, "We couldn't read your enquiry. Please try again.");
+    return unreadable();
   }
+  if (!body || typeof body !== "object") return unreadable();
 
   // Spam checks: a hidden field only bots fill in, and a minimum time spent on the form.
   const elapsed = Number(body.elapsed_ms);
@@ -50,6 +84,15 @@ export async function POST(request: NextRequest) {
     enquiry.target_audience, enquiry.additional_information].join(" ");
   if ((allText.match(/https?:\/\//gi) ?? []).length > MAX_LINKS)
     return fail(422, "Please remove some of the links from your answers.");
+
+  // Checked before anything is stored, so a bad photo never leaves a half-sent enquiry.
+  const photoErrors: PhotoErrors = {};
+  for (const photo of photos) {
+    const problem = uploadedPhotoProblem(new Uint8Array(await photo.file.arrayBuffer()));
+    if (problem) photoErrors[photo.slot] = problem;
+  }
+  if (Object.keys(photoErrors).length)
+    return fail(422, "One of your photos couldn't be used. Please choose it again or remove it.", undefined, photoErrors);
 
   const record: EnquiryInput = {
     ...enquiry,
@@ -95,9 +138,15 @@ export async function POST(request: NextRequest) {
   const reference = `UB-${result.id.slice(0, 8).toUpperCase()}`;
 
   // Alert the team after responding, so the visitor never waits on Telegram or WhatsApp.
+  // The photos follow the Telegram alert as a reply to it.
   if (!result.duplicate)
     after(() =>
-      Promise.all([sendTelegram(formatEnquiryMessage(record, reference, supabaseUrl)), sendWhatsApp(record, reference)]),
+      Promise.all([
+        sendTelegram(formatEnquiryMessage(record, reference, supabaseUrl, photos)).then((messageId) =>
+          sendTelegramPhotos(photos, record, reference, messageId),
+        ),
+        sendWhatsApp(record, reference),
+      ]),
     );
 
   return Response.json({ ok: true, reference });
