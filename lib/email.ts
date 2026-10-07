@@ -5,21 +5,26 @@ import { BUDGETS, SERVICES, START_TIMELINES, labelOf, type EnquiryInput } from "
 import { photoLabel, type EnquiryPhoto } from "./photos";
 
 // The confirmation email a client gets after submitting the enquiry form. It's sent through the Titan
-// mailbox over SMTP, so it comes from support@urbanbeetle.com and replies land in that inbox.
+// mailbox over SMTP, so it comes from hello@urbanbeetle.com and replies land in that inbox.
 
 const SITE_URL = "https://urbanbeetle.com";
+const FROM = site.generalEmail; // hello@urbanbeetle.com
 const WHATSAPP_URL = `https://wa.me/${site.phone.replace(/\D/g, "")}`;
+const INSTAGRAM = site.socials.find((s) => s.label === "Instagram")!.href;
 
-// Email signature, as in the Titan app.
+// The Titan email signature, rebuilt in HTML so its links work. The logo block and icons are cut
+// from the signature image (public/email/).
 const SIGNATURE = {
-  signOff: "Warm regards,",
-  name: "Team Urban Beetle",
-  title: "Urban Beetle · A creative marketing agency",
-  lines: [
-    { label: site.phone, href: `tel:${site.phone.replace(/\s/g, "")}` },
-    { label: site.email, href: `mailto:${site.email}` },
-    { label: "urbanbeetle.com", href: SITE_URL },
+  name: "Raunak Gupta",
+  title: "Founder | Urban Beetle",
+  tagline: "Turn attention into impact.",
+  contacts: [
+    { icon: "phone", label: "+91 8356940351", href: "tel:+918356940351" },
+    { icon: "mail", label: FROM, href: `mailto:${FROM}` },
+    { icon: "web", label: "www.urbanbeetle.com", href: SITE_URL },
+    { icon: "instagram", label: "@urban.beetle", href: INSTAGRAM },
   ],
+  location: "Kalyan, Maharashtra",
 };
 
 const esc = (s: string) =>
@@ -61,10 +66,14 @@ export function confirmationEmail(e: EnquiryInput, reference: string, photos: En
     "",
     `Need to add something, like a deadline or a reference you love? Simply reply to this email, or message us on WhatsApp: ${WHATSAPP_URL}`,
     "",
-    SIGNATURE.signOff,
+    "Warm regards,",
+    "",
     SIGNATURE.name,
     SIGNATURE.title,
-    ...SIGNATURE.lines.map((l) => l.label),
+    ...SIGNATURE.contacts.map((c) => (c.icon === "instagram" ? `Instagram: ${c.label}` : c.label)),
+    SIGNATURE.location,
+    "",
+    SIGNATURE.tagline,
     "",
     `You're receiving this email because you submitted an enquiry at ${SITE_URL}.`,
   ].join("\n");
@@ -77,6 +86,12 @@ export function confirmationEmail(e: EnquiryInput, reference: string, photos: En
   const step = (s: string, i: number) =>
     `<tr><td style="${serif}width:34px;vertical-align:top;padding:6px 0;font-size:18px;color:#a67c2e;">0${i + 1}</td>` +
     `<td style="${font}vertical-align:top;padding:8px 0;font-size:15px;line-height:1.55;color:#3a362f;">${esc(s)}</td></tr>`;
+  const contact = (icon: string, label: string, href?: string) =>
+    `<tr><td width="24" style="padding:5px 0;vertical-align:middle;"><img src="${SITE_URL}/email/icon-${icon}.png" width="17" height="17" alt="" style="display:block;border:0;"></td>` +
+    `<td width="18" style="${font}padding:5px 0;vertical-align:middle;font-size:14px;color:#c9a24f;">|</td>` +
+    `<td style="${font}padding:5px 0;vertical-align:middle;font-size:14px;color:#1c1a17;">` +
+    (href ? `<a href="${href}" style="color:#1c1a17;text-decoration:none;">${esc(label)}</a>` : esc(label)) +
+    `</td></tr>`;
   const socials = site.socials
     .map((s) => `<a href="${s.href}" style="color:#e2b960;text-decoration:none;">${esc(s.label)}</a>`)
     .join(`<span style="color:#5c564b;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`);
@@ -89,6 +104,12 @@ export function confirmationEmail(e: EnquiryInput, reference: string, photos: En
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
 <title>${esc(subject)}</title>
+<style>
+  @media (max-width: 520px) {
+    .sig-col { display: block !important; width: auto !important; }
+    .sig-details { border-left: 0 !important; border-top: 2px solid #b8913f !important; }
+  }
+</style>
 </head>
 <body style="margin:0;padding:0;background:#f4f1ea;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(preheader)}</div>
@@ -124,14 +145,19 @@ export function confirmationEmail(e: EnquiryInput, reference: string, photos: En
     <p style="${font}margin:0;font-size:15px;line-height:1.65;color:#3a362f;">Need to add something, like a deadline or a reference you love? Simply reply to this email, or <a href="${WHATSAPP_URL}" style="color:#a67c2e;font-weight:600;text-decoration:none;">message us on WhatsApp</a>.</p>
   </td></tr>
   <tr><td style="padding:0 36px 36px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #ece6da;"><tr><td style="padding-top:24px;">
-      <p style="${font}margin:0 0 14px;font-size:15px;color:#3a362f;">${esc(SIGNATURE.signOff)}</p>
-      <p style="${serif}margin:0 0 3px;font-size:19px;color:#0b0b0a;">${esc(SIGNATURE.name)}</p>
-      <p style="${font}margin:0 0 10px;font-size:13px;color:#a67c2e;">${esc(SIGNATURE.title)}</p>
-      <p style="${font}margin:0;font-size:13px;line-height:1.7;color:#5c564b;">${SIGNATURE.lines
-        .map((l) => `<a href="${l.href}" style="color:#5c564b;text-decoration:none;">${esc(l.label)}</a>`)
-        .join("<br>")}</p>
-    </td></tr></table>
+    <p style="${font}margin:0 0 16px;font-size:15px;color:#3a362f;">Warm regards,</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f6ec;border-radius:12px;"><tr>
+      <td class="sig-col sig-logo" width="196" style="padding:20px 16px 20px 20px;vertical-align:middle;text-align:center;">
+        <a href="${SITE_URL}"><img src="${SITE_URL}/email/signature-logo.jpg" width="176" alt="Urban Beetle, creative marketing agency. ${esc(SIGNATURE.tagline)}" style="display:block;width:176px;max-width:100%;height:auto;border:0;margin:0 auto;"></a>
+      </td>
+      <td class="sig-col sig-details" style="padding:20px 22px;vertical-align:middle;border-left:2px solid #b8913f;">
+        <p style="${serif}margin:0 0 4px;font-size:21px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;color:#11131a;">${esc(SIGNATURE.name)}</p>
+        <p style="${font}margin:0 0 12px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#a67c2e;">${esc(SIGNATURE.title).replace("|", "&nbsp;|&nbsp;")}</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">${SIGNATURE.contacts.map((c) => contact(c.icon, c.label, c.href)).join("")}</table>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width:64px;height:10px;border-bottom:1px solid #c9a24f;font-size:0;line-height:0;">&nbsp;</td></tr></table>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">${contact("location", SIGNATURE.location)}</table>
+      </td>
+    </tr></table>
   </td></tr>
   <tr><td style="background:#0b0b0a;padding:22px 36px;">
     <p style="${font}margin:0 0 8px;font-size:13px;">${socials}</p>
@@ -156,7 +182,7 @@ export async function sendConfirmationEmail(e: EnquiryInput, reference: string, 
     console.warn("[enquiry] Confirmation email skipped: SMTP_PASSWORD not set.");
     return false;
   }
-  const user = process.env.SMTP_USER || site.email;
+  const user = process.env.SMTP_USER || FROM;
   const port = Number(process.env.SMTP_PORT) || 465;
   try {
     const transport = nodemailer.createTransport({
