@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Bodoni_Moda, Inter_Tight, JetBrains_Mono, Montserrat } from "next/font/google";
 import "lenis/dist/lenis.css";
 import { site } from "@/lib/content";
 import "./globals.css";
@@ -14,6 +14,8 @@ const serif = Bodoni_Moda({
   display: "swap",
 });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// Montserrat is the typeface of the Urban Beetle logo, so the wordmark on the site matches it.
+const brand = Montserrat({ subsets: ["latin"], variable: "--font-brand", display: "swap" });
 
 // Absolute base for social-share image URLs; Vercel provides the production domain automatically.
 const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -53,7 +55,7 @@ const organization = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // Client code adds/removes state classes here (is-loading, has-cursor, menu-open).
-    <html lang="en" className={`${sans.variable} ${serif.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${serif.variable} ${mono.variable} ${brand.variable}`} suppressHydrationWarning>
       <body>
         <noscript>
           <style>{`.preloader{display:none}html.is-loading{overflow:auto}`}</style>

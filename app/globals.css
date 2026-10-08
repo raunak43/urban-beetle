@@ -20,6 +20,7 @@
   --sans: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
   --serif: var(--font-serif), "Didot", "Bodoni 72", Georgia, serif;
   --mono: var(--font-mono), ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --brand: var(--font-brand), "Montserrat", "Helvetica Neue", Arial, sans-serif;
 }
 
 *,
@@ -686,9 +687,10 @@ em {
 }
 
 .nav__word {
+  font-family: var(--brand);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
 }
 
@@ -920,16 +922,20 @@ em {
   height: clamp(96px, 11vw, 156px);
 }
 
+/* Set like the logo: wide-tracked Montserrat capitals. Tracking also follows the last letter of each
+   word, so the matching left padding keeps the wordmark optically centred. */
 .hero-intro__word {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  column-gap: 0.28em;
+  gap: 0.12em 0.42em;
   margin: 0;
-  font-size: clamp(3.4rem, 11.5vw, 12rem);
-  font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
+  padding-left: 0.14em;
+  font-family: var(--brand);
+  font-size: clamp(2.9rem, 6.6vw, 7rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
 }
 
 .split-chars {
@@ -953,9 +959,10 @@ em {
   align-items: center;
   gap: 12px 18px;
   margin: 0;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  letter-spacing: 0.24em;
+  font-family: var(--brand);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -2413,6 +2420,7 @@ em {
     flex-direction: column;
     gap: 10px;
     font-size: 10.5px;
+    letter-spacing: 0.2em;
   }
 
   .hero-intro__rule {
