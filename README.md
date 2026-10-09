@@ -33,6 +33,15 @@ Every "Start a project" button leads to `/enquiry`. Submissions go to `app/api/e
 - **View enquiries:** [Supabase Table Editor](https://supabase.com/dashboard/project/kitkreckzfccjvcxkifg/editor) → `client_enquiries`.
 - **New Supabase project?** Run the file in `supabase/migrations/` in that project's SQL Editor, then update `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
 
+### Spam protection (Cloudflare Turnstile)
+
+A Cloudflare security check sits under the last question, above the Submit button. Cloudflare passes most real visitors by itself and asks for a click only when something looks automated. The API asks Cloudflare whether each enquiry's one-time token is genuine before saving anything, so bots that post to the API directly are refused too. This is on top of the existing hidden field, minimum fill time, link limit and rate limit.
+
+1. At [dash.cloudflare.com](https://dash.cloudflare.com) (a free account works; the domain doesn't need to be on Cloudflare), open **Turnstile → Add widget**. Name it, add the hostname `urbanbeetle.com`, choose **Managed**, and create it.
+2. Put the **Site Key** in `TURNSTILE_SITE_KEY` and the **Secret Key** in `TURNSTILE_SECRET_KEY`, in `.env.local` and on Vercel (mark the secret as sensitive). Then redeploy.
+
+The check is on only when both keys are set; without them the form works as before. For local testing, use Cloudflare's [test keys](https://developers.cloudflare.com/turnstile/troubleshooting/testing/). The logic lives in `lib/turnstile.ts` (server) and `components/enquiry/Turnstile.tsx` (widget).
+
 ### Business photos
 
 Step 05 of the form lets clients add one photo of the outside of their business and up to three of the inside (optional). Photos must be at least **800 × 600 pixels** (either way round) and up to 30 MB each; panoramas wider than 4:1 are refused. Vercel rejects requests over 4.5 MB, so the visitor's browser shrinks each photo before upload: upright, at most 2048 px and 1 MB as a JPEG, with camera details such as GPS location removed. The API checks every photo again, then posts them to the Telegram group as an album replying to the enquiry alert (as image files if Telegram refuses them as photos), and to WhatsApp as one message per photo after the alert. Photos are not stored in Supabase, so the copies in Telegram and WhatsApp are the only ones. The rules live in `lib/photos.ts`.

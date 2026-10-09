@@ -1,12 +1,16 @@
 import type { NextConfig } from "next";
 
-// The browser only ever loads this site's own files (fonts, images and scripts are all self-hosted), so the
-// policy allows nothing else. Inline scripts and styles stay allowed because Next.js and React need them.
+const turnstile = "https://challenges.cloudflare.com"; // Cloudflare's security check on the enquiry form
+
+// The browser loads this site's own files (fonts, images and scripts are all self-hosted) plus Cloudflare's
+// security check (a script and its frame), and nothing else. Inline scripts and styles stay allowed because
+// Next.js and React need them.
 // Skipped in development (hot reloading uses eval and a websocket) and on Vercel preview deployments, which
 // are login-protected and inject Vercel's toolbar.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline' ${turnstile}`,
+  `frame-src ${turnstile}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",

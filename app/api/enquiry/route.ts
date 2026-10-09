@@ -5,6 +5,7 @@ import { PHOTO_SLOTS, photoField, uploadedPhotoProblem, type EnquiryPhoto, type 
 import { formatEnquiryMessage, sendTelegram, sendTelegramPhotos } from "@/lib/telegram";
 import { sendWhatsApp, sendWhatsAppPhotos } from "@/lib/whatsapp";
 import { canEmail, sendConfirmationEmail } from "@/lib/email";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 // The photos go to Telegram and WhatsApp after the response, within this many seconds.
 export const maxDuration = 60;
@@ -95,6 +96,16 @@ export async function POST(request: NextRequest) {
   if (Object.keys(photoErrors).length)
     return fail(422, "One of your photos couldn't be used. Please choose it again or remove it.", undefined, photoErrors);
 
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip");
+
+  // Cloudflare's security check, last before saving: each token works once, so an enquiry that fails an
+  // earlier check doesn't use it up.
+  const human = await verifyTurnstile(body.turnstile_token, ip);
+  if (human === "failed")
+    return fail(403, "The security check didn't go through. Please complete it again, then submit.");
+  if (human === "unavailable")
+    return fail(503, "We couldn't run the security check just now. Please try again in a moment.");
+
   const record: EnquiryInput = {
     ...enquiry,
     email: enquiry.email.toLowerCase(),
@@ -105,7 +116,6 @@ export async function POST(request: NextRequest) {
         : enquiry.social_media,
   };
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip");
   const salt = process.env.ENQUIRY_IP_SALT ?? "";
   const ipHash = ip ? createHash("sha256").update(`${salt}:${ip}`).digest("hex") : null;
 

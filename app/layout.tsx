@@ -45,8 +45,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // The logo is drawn as a CSS mask, so the browser would only find the image after the stylesheet loads.
-  // It is the first thing painted (the preloader), so fetch it straight away.
-  preload("/brand/logo-mask.webp", { as: "image", fetchPriority: "high" });
+  // It is the first thing painted (the preloader), so fetch it straight away. CSS masks fetch in CORS mode,
+  // and a preload is only reused when its mode matches, hence crossOrigin.
+  preload("/brand/logo-mask.webp", { as: "image", fetchPriority: "high", crossOrigin: "anonymous" });
 
   return (
     // Client code adds/removes state classes here (is-loading, has-cursor, menu-open).

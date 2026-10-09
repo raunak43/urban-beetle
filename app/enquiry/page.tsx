@@ -3,6 +3,7 @@ import BeetleMark from "@/components/BeetleMark";
 import Cursor from "@/components/Cursor";
 import EnquiryForm from "@/components/enquiry/EnquiryForm";
 import { breadcrumbJsonLd, jsonLdHtml, openGraphBase } from "@/lib/seo";
+import { turnstileSiteKey } from "@/lib/turnstile";
 import "./enquiry.css";
 
 const description =
@@ -33,7 +34,7 @@ export default function EnquiryPage() {
         </a>
       </header>
       <main className="eq">
-        <EnquiryForm />
+        <EnquiryForm turnstileSiteKey={turnstileSiteKey()} />
       </main>
     </>
   );

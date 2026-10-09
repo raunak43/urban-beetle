@@ -3,6 +3,9 @@
 
 export type Option = { value: string; label: string };
 
+// Tags the Cloudflare security check's token, so the API only accepts tokens made for this form (lib/turnstile.ts).
+export const TURNSTILE_ACTION = "enquiry";
+
 export const SERVICES: Option[] = [
   { value: "branding", label: "Branding" },
   { value: "website", label: "Website Design & Development" },

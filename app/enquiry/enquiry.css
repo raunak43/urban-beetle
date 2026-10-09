@@ -752,6 +752,17 @@
   padding-top: clamp(40px, 5vw, 64px);
 }
 
+/* Cloudflare's security check. Its widget is 65px tall: the space is held so nothing jumps when it appears. */
+.eq-turnstile {
+  display: grid;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.eq-turnstile__box {
+  min-height: 65px;
+}
+
 .eq-missing,
 .eq-alert {
   padding: 18px 22px;

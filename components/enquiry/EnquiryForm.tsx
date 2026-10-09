@@ -20,6 +20,7 @@ import { phoneHref, site } from "@/lib/content";
 import { photoField } from "@/lib/photos";
 import PhotoPicker, { usePhotos } from "./PhotoPicker";
 import SuccessScreen from "./SuccessScreen";
+import Turnstile, { type TurnstileHandle } from "./Turnstile";
 
 const DRAFT_KEY = "ub-enquiry-draft";
 
@@ -67,7 +68,8 @@ function postEnquiry(body: FormData, onProgress?: (fraction: number) => void) {
   });
 }
 
-export default function EnquiryForm() {
+/** turnstileSiteKey: Cloudflare's security check is shown (and required by the API) only when set. */
+export default function EnquiryForm({ turnstileSiteKey }: { turnstileSiteKey?: string }) {
   const [values, setValues] = useState<EnquiryInput>(EMPTY_ENQUIRY);
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [serverFieldErrors, setServerFieldErrors] = useState<FieldErrors>({});
@@ -83,6 +85,9 @@ export default function EnquiryForm() {
   const inFlight = useRef(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
   const restored = useRef(false);
+  const turnstile = useRef<TurnstileHandle>(null);
+  const [humanToken, setHumanToken] = useState<string | null>(null);
+  const [humanError, setHumanError] = useState<string | null>(null);
 
   const errors = useMemo(() => ({ ...validateEnquiry(values), ...serverFieldErrors }), [values, serverFieldErrors]);
   const shown = (f: Field) => ((touched[f] || attempted) && errors[f]) || undefined;
@@ -187,6 +192,11 @@ export default function EnquiryForm() {
       setServerError("Your photos are still being prepared. Please wait a moment, then submit again.");
       return;
     }
+    if (turnstileSiteKey && !humanToken) {
+      setHumanError("Please complete the security check, then submit.");
+      document.getElementById("eq-turnstile")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
 
     inFlight.current = true;
     setSubmitting(true);
@@ -198,6 +208,7 @@ export default function EnquiryForm() {
           enquiry: values,
           elapsed_ms: Date.now() - startedAt.current,
           company_website: honeypotRef.current?.value ?? "",
+          turnstile_token: humanToken,
         }),
       );
       for (const { slot, blob } of photos.ready) body.set(photoField(slot), blob, `${slot}.jpg`);
@@ -222,11 +233,14 @@ export default function EnquiryForm() {
         if (first) focusField(first);
       }
       if (data && !data.ok && data.photoErrors) photos.reject(data.photoErrors);
+      // The server may have used up the security check's one-time token, so get a fresh one.
+      turnstile.current?.reset();
       setServerError(
         (data && !data.ok && data.error) || "Something went wrong while sending your enquiry. Please try again.",
       );
     } catch {
       setServerError("We couldn't reach our servers. Please check your internet connection and try again.");
+      turnstile.current?.reset();
     } finally {
       inFlight.current = false;
       setSubmitting(false);
@@ -513,6 +527,18 @@ export default function EnquiryForm() {
           </Section>
 
           <div className="eq-submit">
+            {turnstileSiteKey && (
+              <Turnstile
+                ref={turnstile}
+                siteKey={turnstileSiteKey}
+                onToken={(token) => {
+                  setHumanToken(token);
+                  if (token) setHumanError(null);
+                }}
+                error={humanError}
+              />
+            )}
+
             {missing.length > 0 && (
               <div className="eq-missing" role="alert">
                 <p>
