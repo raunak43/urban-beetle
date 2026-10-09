@@ -8,6 +8,7 @@
     "start": "next start",
     "frames": "node scripts/extract-frames.mjs",
     "pillars": "node scripts/pillar-images.mjs",
+    "og": "node scripts/og-image.mjs",
     "telegram:chat-id": "node scripts/telegram.mjs chat-id",
     "telegram:test": "node scripts/telegram.mjs test",
     "whatsapp:template": "node scripts/whatsapp.mjs template",

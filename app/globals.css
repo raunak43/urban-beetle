@@ -1594,7 +1594,7 @@ em {
   max-width: 30ch;
   margin: 0;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1989,10 +1989,11 @@ em {
   animation: spin 18s linear infinite;
 }
 
+/* 54 characters of 0.6em-wide mono plus tracking fill the 490-unit circle exactly; keep that sum if the size changes. */
 .cta__ring text {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 2.35px;
+  font-size: 12px;
+  letter-spacing: 1.75px;
   text-transform: uppercase;
   fill: #0a0a0a;
 }
@@ -2203,7 +2204,7 @@ em {
   gap: 32px;
 }
 
-.footer__cols h3 {
+.footer__cols h2 {
   margin: 0 0 18px;
   font-family: var(--mono);
   font-size: 11px;

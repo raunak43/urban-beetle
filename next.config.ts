@@ -34,7 +34,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     // WhatsApp alert buttons can't link to wa.me directly, so the "Chat with client" button opens
     // this, which forwards to a WhatsApp chat with that number.
-    return [{ source: "/chat/:number(\\d{7,15})", destination: "https://wa.me/:number", permanent: false }];
+    return [
+      { source: "/chat/:number(\\d{7,15})", destination: "https://wa.me/:number", permanent: false },
+      // Vercel also serves production at this address. Sending it to the real domain stops Google indexing
+      // a duplicate copy of the site. (Per-deployment URLs already carry a noindex header from Vercel.)
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "urban-beetle.vercel.app" }],
+        destination: "https://urbanbeetle.com/:path*",
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [

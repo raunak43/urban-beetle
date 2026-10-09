@@ -69,6 +69,13 @@ Each new enquiry is also sent to the business WhatsApp (`WHATSAPP_TO`) as a shor
 
 The alert's wording lives in `lib/whatsapp-template.json`, the photo message's in `lib/whatsapp-photo-template.json`. Meta must approve any change, so give an edited template a new `name` and submit it again. To send from your own second number later, register it in the same app, then repeat steps 4–6 with its IDs (templates don't carry over from the test number).
 
+## Search engines (SEO)
+
+- **Page titles and descriptions:** `metadata` in `app/layout.tsx` (home page and defaults) and in each page file. Every page sets its own canonical link with `alternates.canonical`.
+- **Sitemap and robots:** `app/sitemap.ts` (served as `/sitemap.xml`; add every new page here) and `app/robots.ts` (`/robots.txt`).
+- **Structured data and sharing:** `lib/seo.ts` holds the schema.org Organization and WebSite data and the share-preview defaults. The share image is `public/og-image.jpg`; rebuild it from the logo with `npm run og`.
+- **One address:** `urban-beetle.vercel.app` redirects to `urbanbeetle.com` (see `next.config.ts`), so Google indexes only the real domain.
+
 ## Changing the hero video
 
 The hero plays the video as an image sequence (smoother than scrubbing a video file). To use a new video:

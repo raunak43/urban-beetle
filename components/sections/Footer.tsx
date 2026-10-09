@@ -15,15 +15,16 @@ export default function Footer() {
         </div>
         <div className="footer__cols" data-reveal="stagger">
           <nav aria-label="Footer">
-            <h3>Navigate</h3>
+            <h2>Navigate</h2>
             {nav.map((n) => (
               <a key={n.href} href={n.href}>
                 {n.label}
               </a>
             ))}
+            <a href="/enquiry">Start a project</a>
           </nav>
           <div>
-            <h3>Services</h3>
+            <h2>Services</h2>
             {services.slice(0, 6).map((s) => (
               <a key={s.name} href="#services">
                 {s.name}
@@ -31,7 +32,7 @@ export default function Footer() {
             ))}
           </div>
           <div>
-            <h3>Connect</h3>
+            <h2>Connect</h2>
             {site.socials.map((s) => (
               <IconLink key={s.label} href={s.href} icon={s.label}>
                 {s.label}

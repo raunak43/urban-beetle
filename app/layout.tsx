@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Inter_Tight, JetBrains_Mono, Montserrat } from "next/font/google";
+import { preload } from "react-dom";
 import "lenis/dist/lenis.css";
 import { site } from "@/lib/content";
+import { jsonLdHtml, openGraphBase, siteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
 const sans = Inter_Tight({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -17,22 +19,23 @@ const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", displ
 // Montserrat is the typeface of the Urban Beetle logo, so the wordmark on the site matches it.
 const brand = Montserrat({ subsets: ["latin"], variable: "--font-brand", display: "swap" });
 
-// Absolute base for social-share image URLs; Vercel provides the production domain automatically.
-const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : "http://localhost:3000";
-
+// Canonical links and share-image URLs always point at the real domain, whichever address served the page.
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: "Urban Beetle | We Make Brands Move",
-  description:
-    "Urban Beetle is a creative marketing agency blending strategy, creativity and technology to turn ordinary businesses into memorable brands.",
-  openGraph: {
-    title: "Urban Beetle | We Make Brands Move",
-    description: "Strategy + Creativity + Technology. A creative marketing agency for brands that refuse to stand still.",
-    images: ["/images/beetle-landed.webp"],
-    type: "website",
+  metadataBase: new URL(site.url),
+  title: {
+    default: "Urban Beetle | Creative Marketing Agency in Kalyan",
+    template: "%s | Urban Beetle",
   },
+  description:
+    "Urban Beetle is a creative marketing agency in Kalyan, Maharashtra, offering branding, website design, social media, content, paid ads, SEO and photography.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    ...openGraphBase,
+    url: "/",
+    title: "Urban Beetle | Creative Marketing Agency",
+    description: "Strategy + Creativity + Technology. A creative marketing agency for brands that refuse to stand still.",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
@@ -40,19 +43,11 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-// Lets search engines connect the site to the agency's social profiles and contact details.
-const organization = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: site.name,
-  url: siteUrl,
-  logo: `${siteUrl}/apple-icon.png`,
-  email: site.email,
-  telephone: site.phone.replace(/\s/g, ""),
-  sameAs: site.socials.map((s) => s.href),
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // The logo is drawn as a CSS mask, so the browser would only find the image after the stylesheet loads.
+  // It is the first thing painted (the preloader), so fetch it straight away.
+  preload("/brand/logo-mask.webp", { as: "image", fetchPriority: "high" });
+
   return (
     // Client code adds/removes state classes here (is-loading, has-cursor, menu-open).
     <html lang="en" className={`${sans.variable} ${serif.variable} ${mono.variable} ${brand.variable}`} suppressHydrationWarning>
@@ -60,10 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <noscript>
           <style>{`.preloader{display:none}html.is-loading{overflow:auto}`}</style>
         </noscript>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(siteJsonLd)} />
         {children}
       </body>
     </html>

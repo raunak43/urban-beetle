@@ -48,8 +48,8 @@ export default function Statement() {
         <div className="pillars__grid" data-reveal="stagger">
           {pillars.map((p, i) => (
             <article key={p.word} className="pillar glow-card">
-              <div className="pillar__media" aria-hidden="true">
-                <Image src={p.image} alt="" width={1320} height={810} sizes="(max-width: 899px) 100vw, 33vw" />
+              <div className="pillar__media">
+                <Image src={p.image} alt={p.alt} width={1320} height={810} sizes="(max-width: 899px) 100vw, 33vw" />
               </div>
               <div className="pillar__head" aria-hidden="true">
                 <span className="pillar__num">{pad2(i + 1)}</span>

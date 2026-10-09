@@ -4,10 +4,15 @@
 export const site = {
   name: "Urban Beetle",
   tagline: "A creative marketing agency",
+  // The one address search engines should index (canonical links, sitemap, structured data).
+  url: "https://urbanbeetle.com",
   email: "support@urbanbeetle.com",
   generalEmail: "hello@urbanbeetle.com", // shown in the Contact section and footer
   phone: "+91 83569 40351",
-  location: "India", // PLACEHOLDER: city / studio address
+  location: "Kalyan, Maharashtra, India",
+  // Structured version of `location` for search engines (schema.org PostalAddress).
+  address: { locality: "Kalyan", region: "Maharashtra", country: "IN" },
+  founder: { name: "Raunak Gupta", role: "Founder" },
   socials: [
     { label: "Instagram", href: "https://www.instagram.com/urban.beetle/" },
     { label: "Facebook", href: "https://www.facebook.com/Urbanbeetle/" },
@@ -34,6 +39,7 @@ export const pillars = [
     line: "Every move starts with a reason.",
     body: "Research, positioning and a plan that ties creative work to business goals.",
     image: "/images/pillars/strategy.webp",
+    alt: "Urban Beetle notebook on a desk beside brand strategy sketches of positioning, target audience, messaging and channel plan",
     icon: "ring",
   },
   {
@@ -41,6 +47,7 @@ export const pillars = [
     line: "Ideas people actually remember.",
     body: "Identity, content and campaigns crafted to stop the scroll and stay in the mind.",
     image: "/images/pillars/creativity.webp",
+    alt: "Video editing suite showing the golden Urban Beetle on screen, with a camera and a phone preview on the desk",
     icon: "ring",
   },
   {
@@ -48,6 +55,7 @@ export const pillars = [
     line: "Built to scale, measured to grow.",
     body: "Websites, automation, AI-assisted workflows and data that keeps every campaign sharp.",
     image: "/images/pillars/technology.webp",
+    alt: "Laptop showing an AI creative dashboard with the golden beetle, surrounded by panels for AI images, video, automation and analytics",
     icon: "spark",
   },
 ] as const;
