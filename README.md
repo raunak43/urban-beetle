@@ -48,7 +48,7 @@ Step 05 of the form lets clients add one photo of the outside of their business 
 
 ### Confirmation email
 
-Every client who submits the form gets a branded confirmation email from **hello@urbanbeetle.com**. It thanks them, promises a reply within 24 hours, summarises their enquiry and ends with Raunak's signature (logo block and icons in `public/email/`, cut from the Titan signature image). The email is sent through the Titan mailbox over SMTP (`smtp.titan.email`, port 465), so replies land in that inbox. Set `SMTP_PASSWORD` to the mailbox's password in `.env.local` and on Vercel (as a sensitive variable), then redeploy. Without it, enquiries work as before, no email is sent, and the thank-you screen doesn't mention one. The wording and signature live in `lib/email.ts`.
+Every client who submits the form gets a branded confirmation email from **hello@urbanbeetle.com**. It thanks them, promises a reply within 24 hours, summarises their enquiry and ends with Raunak's signature. It's designed dark, in black and gold, because phone mail apps in dark mode recolour light emails (Gmail on Android even inverts small dark images). Its images in `public/email/` (`beetle-gold.png`, `gold-*.png`) are gold on transparent backgrounds so nothing recolours them; the older files there stay because emails already sent still load them. The email is sent through the Titan mailbox over SMTP (`smtp.titan.email`, port 465), so replies land in that inbox. Set `SMTP_PASSWORD` to the mailbox's password in `.env.local` and on Vercel (as a sensitive variable), then redeploy. Without it, enquiries work as before, no email is sent, and the thank-you screen doesn't mention one. The wording and signature live in `lib/email.ts`.
 
 ### Environment variables
 

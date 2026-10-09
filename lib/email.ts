@@ -12,8 +12,25 @@ const FROM = site.generalEmail; // hello@urbanbeetle.com
 const WHATSAPP_URL = `https://wa.me/${site.phone.replace(/\D/g, "")}`;
 const INSTAGRAM = site.socials.find((s) => s.label === "Instagram")!.href;
 
-// The Titan email signature, rebuilt in HTML so its links work. The logo block and icons are cut
-// from the signature image (public/email/).
+// The email is dark, in the brand's black and gold. Phone mail apps in dark mode recolour light emails,
+// and Gmail on Android even inverts small images on dark backgrounds (the old black logo tile turned white).
+// A dark design is left alone, and every image is gold on a transparent background, which nothing recolours.
+// public/email/beetle-gold.png and gold-*.png are those images. The older files there (apple-icon tile,
+// icon-*.png, signature-logo.jpg) are kept because emails already sent still load them.
+const C = {
+  page: "#0b0b0a",
+  card: "#131210",
+  panel: "#1a1813",
+  line: "#2f291c",
+  header: "#070707",
+  heading: "#f5efe3",
+  text: "#cfc6b4",
+  muted: "#9a917f",
+  gold: "#d4a94f",
+  goldText: "#e2b960",
+};
+
+// The Titan email signature, rebuilt in HTML so its links work.
 const SIGNATURE = {
   name: "Raunak Gupta",
   title: "Founder | Urban Beetle",
@@ -80,88 +97,96 @@ export function confirmationEmail(e: EnquiryInput, reference: string, photos: En
 
   const font = "font-family:Helvetica,Arial,sans-serif;";
   const serif = "font-family:Georgia,'Times New Roman',serif;";
-  const row = ([label, value]: [string, string]) =>
-    `<tr><td style="${font}padding:7px 0;width:110px;vertical-align:top;font-size:13px;color:#7a7264;">${esc(label)}</td>` +
-    `<td style="${font}padding:7px 0;vertical-align:top;font-size:14px;color:#1c1a17;font-weight:600;">${esc(value)}</td></tr>`;
+  // The logo's typeface where it's installed (Apple devices often have it), otherwise a clean sans.
+  const brand = "font-family:Montserrat,'Helvetica Neue',Helvetica,Arial,sans-serif;";
+  const label = (s: string) =>
+    `<p style="${font}margin:0 0 10px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};">${s}</p>`;
+  const row = ([name, value]: [string, string]) =>
+    `<tr><td style="${font}padding:7px 0;width:110px;vertical-align:top;font-size:13px;color:${C.muted};">${esc(name)}</td>` +
+    `<td style="${font}padding:7px 0;vertical-align:top;font-size:14px;color:${C.heading};font-weight:600;">${esc(value)}</td></tr>`;
   const step = (s: string, i: number) =>
-    `<tr><td style="${serif}width:34px;vertical-align:top;padding:6px 0;font-size:18px;color:#a67c2e;">0${i + 1}</td>` +
-    `<td style="${font}vertical-align:top;padding:8px 0;font-size:15px;line-height:1.55;color:#3a362f;">${esc(s)}</td></tr>`;
-  const contact = (icon: string, label: string, href?: string) =>
-    `<tr><td width="24" style="padding:5px 0;vertical-align:middle;"><img src="${SITE_URL}/email/icon-${icon}.png" width="17" height="17" alt="" style="display:block;border:0;"></td>` +
-    `<td width="18" style="${font}padding:5px 0;vertical-align:middle;font-size:14px;color:#c9a24f;">|</td>` +
-    `<td style="${font}padding:5px 0;vertical-align:middle;font-size:14px;color:#1c1a17;">` +
-    (href ? `<a href="${href}" style="color:#1c1a17;text-decoration:none;">${esc(label)}</a>` : esc(label)) +
+    `<tr><td style="${serif}width:34px;vertical-align:top;padding:6px 0;font-size:18px;color:${C.gold};">0${i + 1}</td>` +
+    `<td style="${font}vertical-align:top;padding:8px 0;font-size:15px;line-height:1.55;color:${C.text};">${esc(s)}</td></tr>`;
+  const contact = (icon: string, text: string, href?: string) =>
+    `<tr><td width="24" style="padding:5px 0;vertical-align:middle;"><img src="${SITE_URL}/email/gold-${icon}.png" width="17" height="17" alt="" style="display:block;border:0;"></td>` +
+    `<td width="18" style="${font}padding:5px 0;vertical-align:middle;font-size:14px;color:${C.gold};">|</td>` +
+    `<td style="${font}padding:5px 0;vertical-align:middle;font-size:14px;color:${C.heading};">` +
+    (href ? `<a href="${href}" style="color:${C.heading};text-decoration:none;">${esc(text)}</a>` : esc(text)) +
     `</td></tr>`;
   const socials = site.socials
-    .map((s) => `<a href="${s.href}" style="color:#e2b960;text-decoration:none;">${esc(s.label)}</a>`)
-    .join(`<span style="color:#5c564b;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`);
+    .map((s) => `<a href="${s.href}" style="color:${C.goldText};text-decoration:none;">${esc(s.label)}</a>`)
+    .join(`<span style="color:${C.muted};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`);
 
   const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>${esc(subject)}</title>
 <style>
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
   @media (max-width: 520px) {
     .sig-col { display: block !important; width: auto !important; }
-    .sig-details { border-left: 0 !important; border-top: 2px solid #b8913f !important; }
+    .sig-details { border-left: 0 !important; border-top: 1px solid ${C.gold} !important; }
   }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#f4f1ea;">
+<body style="margin:0;padding:0;background:${C.page};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(preheader)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f1ea;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.page};">
 <tr><td align="center" style="padding:32px 14px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
-  <tr><td style="background:#0b0b0a;padding:26px 36px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:${C.card};border:1px solid ${C.line};border-radius:16px;overflow:hidden;">
+  <tr><td style="background:${C.header};padding:24px 36px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="vertical-align:middle;"><img src="${SITE_URL}/apple-icon.png" width="52" height="52" alt="" style="display:block;border:0;border-radius:12px;"></td>
-      <td style="${serif}vertical-align:middle;padding-left:12px;font-size:19px;letter-spacing:5px;color:#e2b960;">URBAN BEETLE</td>
+      <td style="vertical-align:middle;"><img src="${SITE_URL}/email/beetle-gold.png" width="27" height="44" alt="" style="display:block;border:0;"></td>
+      <td style="${brand}vertical-align:middle;padding-left:14px;font-size:17px;font-weight:600;letter-spacing:5px;color:${C.goldText};">URBAN BEETLE</td>
     </tr></table>
   </td></tr>
-  <tr><td style="height:3px;line-height:3px;font-size:0;background:#d4a94f;">&nbsp;</td></tr>
+  <tr><td style="height:2px;line-height:2px;font-size:0;background:${C.gold};">&nbsp;</td></tr>
   <tr><td style="padding:40px 36px 8px;">
-    <p style="${font}margin:0 0 10px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#a67c2e;">Enquiry received &nbsp;·&nbsp; ${esc(reference)}</p>
-    <h1 style="${serif}margin:0 0 20px;font-size:30px;line-height:1.2;font-weight:normal;color:#0b0b0a;">Thank you, ${esc(firstName)}.</h1>
-    <p style="${font}margin:0 0 16px;font-size:16px;line-height:1.65;color:#3a362f;">We've received your enquiry for <strong style="color:#1c1a17;">${esc(e.company_name)}</strong>, and our team is already reviewing it.</p>
-    <p style="${font}margin:0;font-size:16px;line-height:1.65;color:#3a362f;">A member of our team will personally get back to you <strong style="color:#1c1a17;">within 24 hours</strong>, by phone on ${esc(e.phone)} or by email.</p>
+    ${label(`Enquiry received &nbsp;·&nbsp; <span style="white-space:nowrap;">${esc(reference)}</span>`)}
+    <h1 style="${serif}margin:0 0 20px;font-size:30px;line-height:1.2;font-weight:normal;color:${C.heading};">Thank you, ${esc(firstName)}.</h1>
+    <p style="${font}margin:0 0 16px;font-size:16px;line-height:1.65;color:${C.text};">We've received your enquiry for <strong style="color:${C.heading};">${esc(e.company_name)}</strong>, and our team is already reviewing it.</p>
+    <p style="${font}margin:0;font-size:16px;line-height:1.65;color:${C.text};">A member of our team will personally get back to you <strong style="color:${C.heading};">within 24 hours</strong>, by phone on ${esc(e.phone)} or by email.</p>
   </td></tr>
   <tr><td style="padding:28px 36px 8px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#faf7f0;border:1px solid #ecdfc4;border-radius:12px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.panel};border:1px solid ${C.line};border-radius:12px;">
       <tr><td style="padding:20px 24px 14px;">
-        <p style="${font}margin:0 0 8px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#a67c2e;">Your enquiry</p>
+        ${label("Your enquiry")}
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${summary.map(row).join("")}</table>
       </td></tr>
     </table>
   </td></tr>
   <tr><td style="padding:28px 36px 4px;">
-    <p style="${font}margin:0 0 8px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#a67c2e;">What happens next</p>
+    ${label("What happens next")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${steps.map(step).join("")}</table>
   </td></tr>
   <tr><td style="padding:20px 36px 30px;">
-    <p style="${font}margin:0;font-size:15px;line-height:1.65;color:#3a362f;">Need to add something, like a deadline or a reference you love? Simply reply to this email, or <a href="${WHATSAPP_URL}" style="color:#a67c2e;font-weight:600;text-decoration:none;">message us on WhatsApp</a>.</p>
+    <p style="${font}margin:0;font-size:15px;line-height:1.65;color:${C.text};">Need to add something, like a deadline or a reference you love? Simply reply to this email, or <a href="${WHATSAPP_URL}" style="color:${C.goldText};font-weight:600;text-decoration:none;">message us on WhatsApp</a>.</p>
   </td></tr>
   <tr><td style="padding:0 36px 36px;">
-    <p style="${font}margin:0 0 16px;font-size:15px;color:#3a362f;">Warm regards,</p>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f6ec;border-radius:12px;"><tr>
-      <td class="sig-col sig-logo" width="196" style="padding:20px 16px 20px 20px;vertical-align:middle;text-align:center;">
-        <a href="${SITE_URL}"><img src="${SITE_URL}/email/signature-logo.jpg" width="176" alt="Urban Beetle, creative marketing agency. ${esc(SIGNATURE.tagline)}" style="display:block;width:176px;max-width:100%;height:auto;border:0;margin:0 auto;"></a>
+    <p style="${font}margin:0 0 16px;font-size:15px;color:${C.text};">Warm regards,</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.panel};border:1px solid ${C.line};border-radius:12px;"><tr>
+      <td class="sig-col sig-logo" width="220" style="padding:22px 16px;vertical-align:middle;text-align:center;">
+        <a href="${SITE_URL}"><img src="${SITE_URL}/email/beetle-gold.png" width="39" height="64" alt="Urban Beetle" style="display:block;border:0;margin:0 auto 14px;"></a>
+        <p style="${brand}margin:0;padding-left:4px;font-size:15px;font-weight:600;letter-spacing:4px;color:${C.heading};">URBAN BEETLE</p>
+        <p style="${brand}margin:7px 0 0;padding-left:1px;font-size:9px;letter-spacing:1.2px;color:${C.muted};">CREATIVE MARKETING AGENCY</p>
+        <p style="${brand}margin:12px 0 0;padding-left:1px;font-size:9px;letter-spacing:1.2px;color:${C.gold};">${esc(SIGNATURE.tagline.toUpperCase())}</p>
       </td>
-      <td class="sig-col sig-details" style="padding:20px 22px;vertical-align:middle;border-left:2px solid #b8913f;">
-        <p style="${serif}margin:0 0 4px;font-size:21px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;color:#11131a;">${esc(SIGNATURE.name)}</p>
-        <p style="${font}margin:0 0 12px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#a67c2e;">${esc(SIGNATURE.title).replace("|", "&nbsp;|&nbsp;")}</p>
+      <td class="sig-col sig-details" style="padding:20px 22px;vertical-align:middle;border-left:1px solid ${C.gold};">
+        <p style="${serif}margin:0 0 4px;font-size:21px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;color:${C.heading};">${esc(SIGNATURE.name)}</p>
+        <p style="${font}margin:0 0 12px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:${C.gold};">${esc(SIGNATURE.title).replace("|", "&nbsp;|&nbsp;")}</p>
         <table role="presentation" cellpadding="0" cellspacing="0" border="0">${SIGNATURE.contacts.map((c) => contact(c.icon, c.label, c.href)).join("")}</table>
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width:64px;height:10px;border-bottom:1px solid #c9a24f;font-size:0;line-height:0;">&nbsp;</td></tr></table>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width:64px;height:10px;border-bottom:1px solid ${C.line};font-size:0;line-height:0;">&nbsp;</td></tr></table>
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">${contact("location", SIGNATURE.location)}</table>
       </td>
     </tr></table>
   </td></tr>
-  <tr><td style="background:#0b0b0a;padding:22px 36px;">
+  <tr><td style="background:${C.header};padding:22px 36px;border-top:1px solid ${C.line};">
     <p style="${font}margin:0 0 8px;font-size:13px;">${socials}</p>
-    <p style="${font}margin:0;font-size:11.5px;line-height:1.6;color:#8a8376;">You're receiving this email because you submitted an enquiry at <a href="${SITE_URL}" style="color:#8a8376;">urbanbeetle.com</a>.</p>
+    <p style="${font}margin:0;font-size:11.5px;line-height:1.6;color:${C.muted};">You're receiving this email because you submitted an enquiry at <a href="${SITE_URL}" style="color:${C.muted};">urbanbeetle.com</a>.</p>
   </td></tr>
 </table>
 </td></tr>
