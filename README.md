@@ -50,6 +50,10 @@ Step 05 of the form lets clients add one photo of the outside of their business 
 
 Every client who submits the form gets a branded confirmation email from **hello@urbanbeetle.com**. It thanks them, promises a reply within 24 hours, summarises their enquiry and ends with Raunak's signature. It's designed dark, in black and gold, because phone mail apps in dark mode recolour light emails (Gmail on Android even inverts small dark images). Its images in `public/email/` (`beetle-gold.png`, `gold-*.png`) are gold on transparent backgrounds so nothing recolours them; the older files there stay because emails already sent still load them. The email is sent through the Titan mailbox over SMTP (`smtp.titan.email`, port 465), so replies land in that inbox. Set `SMTP_PASSWORD` to the mailbox's password in `.env.local` and on Vercel (as a sensitive variable), then redeploy. Without it, enquiries work as before, no email is sent, and the thank-you screen doesn't mention one. The wording and signature live in `lib/email.ts`.
 
+### Keeping the database awake
+
+Supabase pauses Free Plan projects after about a week without database activity, which would stop the enquiry form from saving. Vercel calls `/api/keepalive` twice a day (schedules in `vercel.json`), which makes one small query through `keepalive()` (`supabase/migrations/*_keepalive.sql`; until that SQL has been run, it reaches the database through `submit_enquiry` with a payload that is refused before anything is saved). If the database doesn't answer, the Telegram group gets an alert with a link to resume the project. Setting `CRON_SECRET` on Vercel restricts the endpoint to Vercel's scheduler.
+
 ### Environment variables
 
 Copy `.env.example` to `.env.local` for local development, and add the same variables in Vercel → Project → Settings → Environment Variables before deploying.
