@@ -42,9 +42,11 @@ const nextConfig: NextConfig = {
       { source: "/chat/:number(\\d{7,15})", destination: "https://wa.me/:number", permanent: false },
       // Vercel also serves production at this address. Sending it to the real domain stops Google indexing
       // a duplicate copy of the site. (Per-deployment URLs already carry a noindex header from Vercel.)
+      // Vercel's scheduled jobs call a *.vercel.app address and don't follow redirects, so they're let through.
       {
         source: "/:path*",
         has: [{ type: "host", value: "urban-beetle.vercel.app" }],
+        missing: [{ type: "header", key: "x-vercel-cron-schedule" }],
         destination: "https://urbanbeetle.com/:path*",
         permanent: true,
       },
