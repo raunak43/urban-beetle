@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import BeetleMark from "./BeetleMark";
 import IconLink from "./IconLink";
-import { nav, phoneHref, site } from "@/lib/content";
+import { nav, phoneHref, site, whatsappHref } from "@/lib/content";
 import { getLenis, loader } from "@/lib/motion";
 import { pad2 } from "./Text";
 
@@ -111,6 +111,9 @@ export default function Nav() {
           </IconLink>
           <IconLink href={phoneHref} icon="phone">
             {site.phone}
+          </IconLink>
+          <IconLink href={whatsappHref} icon="WhatsApp">
+            WhatsApp
           </IconLink>
           <div className="menu__socials">
             {site.socials.map((s) => (

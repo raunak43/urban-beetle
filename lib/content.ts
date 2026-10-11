@@ -22,6 +22,12 @@ export const site = {
 
 export const phoneHref = `tel:${site.phone.replace(/\s/g, "")}`;
 
+// "Chat on WhatsApp" links open a chat with the studio's number with this message already typed,
+// so the visitor only has to tap Send.
+export const whatsappMessage =
+  "Hi Urban Beetle! I came across your website and I'd like to know more about your marketing services for my business.";
+export const whatsappHref = `https://wa.me/${site.phone.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappMessage)}`;
+
 // Social profiles open in a new tab so visitors don't lose the site.
 export const external = { target: "_blank", rel: "noopener noreferrer" } as const;
 

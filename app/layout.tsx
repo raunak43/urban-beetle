@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Inter_Tight, JetBrains_Mono, Montserrat } from "next/font/google";
 import { preload } from "react-dom";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import "lenis/dist/lenis.css";
 import { site } from "@/lib/content";
 import { jsonLdHtml, openGraphBase, siteJsonLd } from "@/lib/seo";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(siteJsonLd)} />
         {children}
+        <WhatsAppButton />
       </body>
     </html>
   );

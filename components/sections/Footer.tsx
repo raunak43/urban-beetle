@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import BeetleMark from "../BeetleMark";
 import IconLink from "../IconLink";
-import { nav, phoneHref, services, site } from "@/lib/content";
+import { nav, phoneHref, services, site, whatsappHref } from "@/lib/content";
 
 export default function Footer() {
   return (
@@ -43,6 +43,9 @@ export default function Footer() {
             </IconLink>
             <IconLink href={phoneHref} icon="phone">
               {site.phone}
+            </IconLink>
+            <IconLink href={whatsappHref} icon="WhatsApp">
+              WhatsApp
             </IconLink>
           </div>
         </div>

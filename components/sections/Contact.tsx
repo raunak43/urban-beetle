@@ -1,4 +1,4 @@
-import { phoneHref, site } from "@/lib/content";
+import { phoneHref, site, whatsappHref } from "@/lib/content";
 import IconLink from "../IconLink";
 import { Eyebrow, Words } from "../Text";
 
@@ -28,6 +28,14 @@ export default function Contact() {
               <dd>
                 <IconLink href={phoneHref} icon="phone">
                   {site.phone}
+                </IconLink>
+              </dd>
+            </div>
+            <div>
+              <dt>WhatsApp</dt>
+              <dd>
+                <IconLink href={whatsappHref} icon="WhatsApp">
+                  Chat with us
                 </IconLink>
               </dd>
             </div>

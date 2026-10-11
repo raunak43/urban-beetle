@@ -327,6 +327,49 @@ em {
   transform: scale(1.12);
 }
 
+/* Floating "Chat on WhatsApp" button (components/WhatsAppButton.tsx), on every page. It sits above the
+   page but under the menu (75) and nav (80), and appears once the preloader has gone. The entrance uses
+   `translate` because the magnetic hover drives `transform`. */
+.wa-float {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 54px;
+  padding: 0 22px 0 16px;
+  border: 1px solid rgba(212, 169, 79, 0.5);
+  border-radius: 999px;
+  background: rgba(12, 12, 11, 0.82);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: opacity 0.6s var(--ease), translate 0.8s var(--ease), border-color 0.3s;
+}
+
+.wa-float:hover {
+  border-color: rgba(37, 211, 102, 0.6);
+}
+
+.wa-float__icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  fill: #25d366; /* WhatsApp's own green, so the button is recognised at a glance */
+}
+
+html.is-loading .wa-float {
+  opacity: 0;
+  translate: 0 16px;
+  pointer-events: none;
+}
+
 .link-arrow {
   position: relative;
   display: inline-flex;
@@ -2289,7 +2332,7 @@ em {
   justify-content: space-between;
   gap: 16px;
   margin-top: clamp(20px, 3vw, 40px);
-  padding-block: 28px;
+  padding-block: 28px 104px; /* the extra bottom space keeps "Back to top" clear of the WhatsApp button */
   border-top: 1px solid var(--line);
   font-family: var(--mono);
   font-size: 11px;
@@ -2531,6 +2574,22 @@ em {
 
   .footer__bottom {
     flex-direction: column;
+  }
+
+  .wa-float {
+    justify-content: center;
+    width: 54px;
+    padding: 0;
+  }
+
+  .wa-float__label {
+    display: none;
+  }
+
+  /* While someone types in the enquiry form, the button steps aside so it never covers a field. */
+  body:has(.eq-form:focus-within) .wa-float {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .grain {
