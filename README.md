@@ -42,6 +42,10 @@ A Cloudflare security check sits under the last question, above the Submit butto
 
 The check is on only when both keys are set; without them the form works as before. For local testing, use Cloudflare's [test keys](https://developers.cloudflare.com/turnstile/troubleshooting/testing/). The logic lives in `lib/turnstile.ts` (server) and `components/enquiry/Turnstile.tsx` (widget).
 
+### Google Sheet of enquiries
+
+Every new enquiry is also added as a row to a Google Sheet (it opens in Excel, or downloads as .xlsx). Create a sheet, open **Extensions → Apps Script**, paste `scripts/google-sheet-apps-script.gs`, then **Deploy → New deployment → Web app** (Execute as: Me; Who has access: Anyone). Put the web app URL in `SHEETS_WEBHOOK_URL` on Vercel (sensitive: anyone with it can add rows) and redeploy. The columns are set in `lib/sheets.ts`.
+
 ### Business photos
 
 Step 05 of the form lets clients add one photo of the outside of their business and up to three of the inside (optional). Photos must be at least **800 × 600 pixels** (either way round) and up to 30 MB each; panoramas wider than 4:1 are refused. Vercel rejects requests over 4.5 MB, so the visitor's browser shrinks each photo before upload: upright, at most 2048 px and 1 MB as a JPEG, with camera details such as GPS location removed. The API checks every photo again, then posts them to the Telegram group as an album replying to the enquiry alert (as image files if Telegram refuses them as photos), and to WhatsApp as one message per photo after the alert. Photos are not stored in Supabase, so the copies in Telegram and WhatsApp are the only ones. The rules live in `lib/photos.ts`.

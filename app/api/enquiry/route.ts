@@ -6,6 +6,7 @@ import { formatEnquiryMessage, sendTelegram, sendTelegramPhotos } from "@/lib/te
 import { sendWhatsApp, sendWhatsAppPhotos } from "@/lib/whatsapp";
 import { canEmail, sendConfirmationEmail } from "@/lib/email";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { addToSheet } from "@/lib/sheets";
 
 // The photos go to Telegram and WhatsApp after the response, within this many seconds.
 export const maxDuration = 60;
@@ -148,8 +149,9 @@ export async function POST(request: NextRequest) {
 
   const reference = `UB-${result.id.slice(0, 8).toUpperCase()}`;
 
-  // Alert the team and email the client after responding, so the visitor never waits on Telegram,
-  // WhatsApp or email. On both chat apps, the photos follow the alert (on Telegram as a reply to it).
+  // Alert the team, email the client and add the Google Sheet row after responding, so the visitor never
+  // waits on Telegram, WhatsApp, email or the sheet. On both chat apps, the photos follow the alert
+  // (on Telegram as a reply to it).
   if (!result.duplicate)
     after(() =>
       Promise.all([
@@ -158,6 +160,7 @@ export async function POST(request: NextRequest) {
         ),
         sendWhatsApp(record, reference).then(() => sendWhatsAppPhotos(photos, record, reference)),
         sendConfirmationEmail(record, reference, photos),
+        addToSheet(record, reference, photos),
       ]),
     );
 
