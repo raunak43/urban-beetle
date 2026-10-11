@@ -40,7 +40,7 @@ export default function Contact() {
               </dd>
             </div>
             <div>
-              <dt>Studio</dt>
+              <dt>Based in</dt>
               <dd>{site.location}</dd>
             </div>
             <div>
