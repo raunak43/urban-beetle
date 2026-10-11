@@ -13,6 +13,8 @@ export const site = {
   // Structured version of `location` for search engines (schema.org PostalAddress).
   address: { locality: "Kalyan", region: "Maharashtra", country: "IN" },
   founder: { name: "Raunak Gupta", role: "Founder" },
+  // Where clients come from, named on the service pages and in the data search engines read.
+  serviceAreas: ["Kalyan", "Dombivli", "Thane", "Navi Mumbai", "Mumbai"],
   socials: [
     { label: "Instagram", href: "https://www.instagram.com/urban.beetle/" },
     { label: "Facebook", href: "https://www.facebook.com/Urbanbeetle/" },
@@ -66,49 +68,59 @@ export const pillars = [
   },
 ] as const;
 
+// Each service has its own page at /services/<slug>; that page's copy lives in lib/service-pages.ts.
 export const services = [
   {
     name: "Branding",
+    slug: "branding",
     body: "Naming, positioning, identity systems and brand guidelines that give a business a clear, ownable presence.",
     tags: ["Identity", "Positioning", "Guidelines"],
   },
   {
     name: "Website Design",
+    slug: "website-design",
     body: "Cinematic, fast and conversion-focused websites designed and developed end to end.",
     tags: ["UX / UI", "Development", "E-commerce"],
   },
   {
     name: "Social Media",
+    slug: "social-media-marketing",
     body: "Platform-native strategy, calendars and community management that build real audiences.",
     tags: ["Strategy", "Management", "Community"],
   },
   {
     name: "Content Creation",
+    slug: "content-creation",
     body: "Reels, films, motion and editorial content produced to feel premium on every screen.",
     tags: ["Video", "Motion", "Copy"],
   },
   {
     name: "Paid Advertising",
+    slug: "paid-advertising",
     body: "Performance campaigns across Meta and Google, tested, tracked and optimised for return.",
     tags: ["Meta Ads", "Google Ads", "Analytics"],
   },
   {
     name: "Photography",
+    slug: "photography",
     body: "Product, food, fashion and campaign photography with an art-directed, editorial eye.",
     tags: ["Product", "Campaign", "Editorial"],
   },
   {
     name: "SEO",
+    slug: "seo",
     body: "Technical, on-page and content SEO that compounds visibility month after month.",
     tags: ["Technical", "Content", "Local"],
   },
   {
     name: "Influencer Marketing",
+    slug: "influencer-marketing",
     body: "Creator partnerships matched to your audience, managed from brief to results.",
     tags: ["Creators", "Campaigns", "UGC"],
   },
   {
     name: "Creative Design",
+    slug: "creative-design",
     body: "Campaign key visuals, packaging, print and digital design with a consistent signature.",
     tags: ["Campaigns", "Packaging", "Print"],
   },

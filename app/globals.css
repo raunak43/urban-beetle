@@ -1451,7 +1451,7 @@ html.is-loading .wa-float {
 }
 
 .service:hover::before,
-.service:focus-visible::before {
+.service:has(:focus-visible)::before {
   transform: scaleX(1);
 }
 
@@ -1464,6 +1464,17 @@ html.is-loading .wa-float {
 
 .service:hover .service__num {
   color: var(--gold);
+}
+
+.service__link {
+  outline: none;
+}
+
+/* Stretches the link over the whole row, so the number, description and arrow are all clickable. */
+.service__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 
 .service__name {
@@ -1499,7 +1510,7 @@ html.is-loading .wa-float {
 }
 
 .service:hover .service__name-text,
-.service:focus-visible .service__name-text {
+.service:has(:focus-visible) .service__name-text {
   transform: translateY(-100%);
 }
 

@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="footer__brand" data-reveal="">
           <BeetleMark className="footer__mark" />
           <p>
-            Urban Beetle is a creative marketing agency making brands move through strategy, creativity and technology.
+            Urban Beetle is a creative marketing agency in Kalyan, making brands move through strategy, creativity and technology.
           </p>
         </div>
         <div className="footer__cols" data-reveal="stagger">
@@ -26,10 +26,11 @@ export default function Footer() {
           <div>
             <h2>Services</h2>
             {services.slice(0, 6).map((s) => (
-              <a key={s.name} href="#services">
+              <a key={s.name} href={`/services/${s.slug}`}>
                 {s.name}
               </a>
             ))}
+            <a href="/services">All services</a>
           </div>
           <div>
             <h2>Connect</h2>

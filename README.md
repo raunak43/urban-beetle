@@ -86,6 +86,9 @@ The alert's wording lives in `lib/whatsapp-template.json`, the photo message's i
 
 - **Page titles and descriptions:** `metadata` in `app/layout.tsx` (home page and defaults) and in each page file. Every page sets its own canonical link with `alternates.canonical`.
 - **Sitemap and robots:** `app/sitemap.ts` (served as `/sitemap.xml`; add every new page here) and `app/robots.ts` (`/robots.txt`).
+- **Service pages:** `/services` and one page per service at `/services/<slug>` (e.g. "Social Media Marketing Agency in Kalyan"), so each service can rank for its own searches. The slugs live with the services in `lib/content.ts`; each page's copy (title, intro, what's included, who it's for, FAQs) is in `lib/service-pages.ts`. The towns named on the pages and in the structured data are `site.serviceAreas`.
+- **AI assistants:** `/llms.txt` (`app/llms.txt/route.ts`) is a plain summary of the agency and its service pages for ChatGPT, Gemini, Perplexity and the like, built from the same content.
+- **Bing and ChatGPT search:** after deploying new or changed pages, run `npm run indexnow` to tell Bing (which ChatGPT's search uses) and other IndexNow engines straight away. Its key file is `public/<key>.txt`.
 - **Structured data and sharing:** `lib/seo.ts` holds the schema.org Organization and WebSite data and the share-preview defaults. The share image is `public/og-image.jpg`; rebuild it from the logo with `npm run og`.
 - **One address:** `urban-beetle.vercel.app` redirects to `urbanbeetle.com` (see `next.config.ts`), so Google indexes only the real domain.
 

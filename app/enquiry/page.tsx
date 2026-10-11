@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function EnquiryPage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(breadcrumbJsonLd("Start a project", "/enquiry"))} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(breadcrumbJsonLd({ name: "Start a project", path: "/enquiry" }))} />
       <Cursor />
       <div className="grain" aria-hidden="true" />
       <header className="eq-top">

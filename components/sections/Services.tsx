@@ -17,12 +17,15 @@ export default function Services() {
 
         <ol className="service-list">
           {services.map((s, i) => (
-            <li key={s.name} className="service" tabIndex={0} data-reveal="">
+            <li key={s.name} className="service" data-reveal="">
               <span className="service__num">{pad2(i + 1)}</span>
               <h3 className="service__name">
-                <span className="service__name-text" data-text={s.name}>
-                  {s.name}
-                </span>
+                {/* The link covers the whole row (see .service__link) and leads to the service's own page. */}
+                <a href={`/services/${s.slug}`} className="service__link">
+                  <span className="service__name-text" data-text={s.name}>
+                    {s.name}
+                  </span>
+                </a>
               </h3>
               <div className="service__detail">
                 <div>

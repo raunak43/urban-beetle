@@ -24,6 +24,12 @@ export const openGraphBase = {
 
 const orgId = `${site.url}/#organization`;
 
+// The towns the agency works in, then the rest of India.
+const areaServed = [
+  ...site.serviceAreas.map((name) => ({ "@type": "City", name })),
+  { "@type": "Country", name: "India" },
+];
+
 // Lets search engines connect the site to the agency's name, logo, location, contact details and social profiles.
 const organization = {
   "@type": "Organization",
@@ -42,7 +48,7 @@ const organization = {
     addressRegion: site.address.region,
     addressCountry: site.address.country,
   },
-  areaServed: { "@type": "Country", name: "India" },
+  areaServed,
   founder: { "@type": "Person", name: site.founder.name, jobTitle: site.founder.role },
   contactPoint: {
     "@type": "ContactPoint",
@@ -52,6 +58,15 @@ const organization = {
     areaServed: "IN",
   },
   knowsAbout: services.map((s) => s.name),
+  // The services and their pages, so search engines and AI assistants can tell what the agency offers.
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Marketing services",
+    itemListElement: services.map((s) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Service", name: s.name, url: `${site.url}/services/${s.slug}` },
+    })),
+  },
   sameAs: site.socials.map((s) => s.href),
 };
 
@@ -67,14 +82,53 @@ const website = {
 
 export const siteJsonLd = { "@context": "https://schema.org", "@graph": [organization, website] };
 
-// Breadcrumb trail for an inner page, so results show "Urban Beetle › Start a project" instead of the URL.
-export function breadcrumbJsonLd(name: string, path: string) {
+type Crumb = { name: string; path: string };
+
+// Breadcrumb trail for an inner page, so results show "Urban Beetle › Services › SEO" instead of the URL.
+const breadcrumbList = (trail: Crumb[]) => ({
+  "@type": "BreadcrumbList",
+  itemListElement: [{ name: site.name, path: "" }, ...trail].map((crumb, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: crumb.name,
+    item: `${site.url}${crumb.path}`,
+  })),
+});
+
+export const breadcrumbJsonLd = (...trail: Crumb[]) => ({ "@context": "https://schema.org", ...breadcrumbList(trail) });
+
+// A service page: the service itself (offered by the agency in its towns), its questions and answers,
+// and the breadcrumb trail.
+export function servicePageJsonLd(page: {
+  name: string;
+  path: string;
+  description: string;
+  faqs: { q: string; a: string }[];
+}) {
   return {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: site.name, item: site.url },
-      { "@type": "ListItem", position: 2, name, item: `${site.url}${path}` },
+    "@graph": [
+      {
+        "@type": "Service",
+        name: page.name,
+        serviceType: page.name,
+        url: `${site.url}${page.path}`,
+        description: page.description,
+        provider: { "@id": orgId },
+        areaServed,
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: page.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+      breadcrumbList([
+        { name: "Services", path: "/services" },
+        { name: page.name, path: page.path },
+      ]),
     ],
   };
 }
