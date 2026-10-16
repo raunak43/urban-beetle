@@ -928,6 +928,12 @@
   border-top-color: var(--gold);
 }
 
+.eq-submit__note a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .eq-submit__note {
   max-width: 36ch;
   margin: 0;

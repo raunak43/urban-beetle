@@ -2337,6 +2337,14 @@ html.is-loading .wa-float {
   width: 0.25em;
 }
 
+.footer__bottom span a {
+  transition: color 0.3s;
+}
+
+.footer__bottom span a:hover {
+  color: var(--gold);
+}
+
 .footer__bottom {
   display: flex;
   flex-wrap: wrap;

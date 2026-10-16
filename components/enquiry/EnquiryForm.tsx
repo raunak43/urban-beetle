@@ -602,7 +602,11 @@ export default function EnquiryForm({ turnstileSiteKey }: { turnstileSiteKey?: s
               </button>
               <p className="eq-submit__note">
                 Our team will get back to you within 24 hours. Your details are kept private and used only to respond to
-                your enquiry.
+                your enquiry (see our{" "}
+                <a href="/privacy" target="_blank">
+                  privacy policy
+                </a>
+                ).
               </p>
             </div>
           </div>
