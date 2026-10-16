@@ -1418,134 +1418,167 @@ html.is-loading .wa-float {
   -webkit-text-stroke: 1px rgba(212, 169, 79, 0.45);
 }
 
-/* ---------- Services ---------- */
+/* ---------- Services: a horizontal row of cards ----------
+   Swiped natively by default (touch screens, reduced motion); on desktop MotionEffects pins the row
+   and slides it sideways as you scroll, adding .is-pinned. */
 
-.service-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--line);
-}
-
-.service {
+.hs {
   position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) minmax(0, 400px) 48px;
-  align-items: center;
-  gap: 24px;
-  padding: clamp(22px, 2.6vw, 38px) 0;
-  border-bottom: 1px solid var(--line);
+}
+
+.hs__track {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  /* The first card lines up with the page's content edge, however wide the screen. */
+  padding: 4px max(var(--pad), calc((100vw - 1480px) / 2 + var(--pad))) 8px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--pad);
+  scrollbar-width: none;
+}
+
+.hs__track::-webkit-scrollbar {
+  display: none;
+}
+
+.hs.is-pinned .hs__track {
+  width: max-content;
+  overflow: visible;
+  will-change: transform;
+}
+
+.hs__item {
+  flex: none;
+  width: clamp(280px, 27vw, 400px);
+  scroll-snap-align: start;
+}
+
+.hs-card {
+  display: flex;
+  flex-direction: column;
+  height: clamp(380px, 56vh, 480px);
+  padding: 30px 28px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(232, 214, 170, 0.045), rgba(255, 255, 255, 0.008));
   outline: none;
+  transition: border-color 0.5s var(--ease);
 }
 
-.service::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(90deg, rgba(212, 169, 79, 0.1), transparent 75%);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.9s var(--ease);
+.hs-card::before {
+  border-radius: inherit;
 }
 
-.service:hover::before,
-.service:has(:focus-visible)::before {
-  transform: scaleX(1);
+.hs-card:hover,
+.hs-card:focus-visible {
+  border-color: rgba(212, 169, 79, 0.45);
 }
 
-.service__num {
+.hs-card:focus-visible {
+  box-shadow: 0 0 0 3px rgba(212, 169, 79, 0.35);
+}
+
+.hs-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-family: var(--mono);
   font-size: 12px;
-  color: var(--muted);
-  transition: color 0.4s;
-}
-
-.service:hover .service__num {
   color: var(--gold);
 }
 
-.service__link {
-  outline: none;
-}
-
-/* Stretches the link over the whole row, so the number, description and arrow are all clickable. */
-.service__link::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.service__name {
-  height: 1.08em;
-  margin: 0;
-  overflow: hidden;
-  font-size: clamp(2rem, 4.6vw, 4.8rem);
-  line-height: 1.08;
-  letter-spacing: -0.04em;
-}
-
-.service__name-text {
-  position: relative;
-  display: inline-block;
-  transition: transform 0.8s var(--ease);
-}
-
-.service__name-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 100%;
-  left: 0;
-  font-family: var(--serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  background: var(--gold-grad);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.service:hover .service__name-text,
-.service:has(:focus-visible) .service__name-text {
-  transform: translateY(-100%);
-}
-
-.service__detail p {
-  margin: 0 0 14px;
-  color: var(--muted);
-  transition: color 0.4s;
-}
-
-.service:hover .service__detail p {
-  color: var(--text);
-}
-
-.service__detail .tags {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.5s, transform 0.6s var(--ease);
-}
-
-.service:hover .tags,
-.service:focus-within .tags {
-  opacity: 1;
-  transform: none;
-}
-
-.service__arrow {
-  justify-self: end;
-  font-size: 26px;
+.hs-card__arrow {
+  font-size: 22px;
   color: var(--muted);
   transition: transform 0.6s var(--ease), color 0.4s;
 }
 
-.service:hover .service__arrow {
+.hs-card:hover .hs-card__arrow,
+.hs-card:focus-visible .hs-card__arrow {
   color: var(--gold);
   transform: rotate(45deg);
+}
+
+.hs-card__name {
+  margin: auto 0 14px;
+  font-size: clamp(2rem, 2.9vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  transition: color 0.4s;
+}
+
+.hs-card:hover .hs-card__name {
+  color: var(--gold-light);
+}
+
+.hs-card__body {
+  margin-bottom: 22px;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.hs-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hs-card__tags span {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hs__foot {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.hs__progress {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+  height: 1px;
+  overflow: hidden;
+  background: var(--line-strong);
+}
+
+.hs__progress i {
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.hs__hint {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* "Scroll" where the row is pinned, "Swipe" everywhere else. */
+.hs__hint--scroll,
+.hs.is-pinned .hs__hint--swipe {
+  display: none;
+}
+
+.hs.is-pinned .hs__hint--scroll {
+  display: inline;
 }
 
 /* ---------- Why ---------- */
@@ -2376,10 +2409,6 @@ html.is-loading .wa-float {
   .why__grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .service {
-    grid-template-columns: 56px minmax(0, 1fr) minmax(0, 300px) 32px;
-  }
 }
 
 @media (max-width: 899px) {
@@ -2421,25 +2450,6 @@ html.is-loading .wa-float {
 
   .pillar:last-child {
     border-bottom: 0;
-  }
-
-  .service {
-    grid-template-columns: 40px minmax(0, 1fr);
-    gap: 10px 14px;
-    align-items: baseline;
-  }
-
-  .service__detail {
-    grid-column: 2 / -1;
-  }
-
-  .service__detail .tags {
-    opacity: 1;
-    transform: none;
-  }
-
-  .service__arrow {
-    display: none;
   }
 
   .about__grid,
@@ -2593,6 +2603,15 @@ html.is-loading .wa-float {
 
   .footer__bottom {
     flex-direction: column;
+  }
+
+  .hs__item {
+    width: 80vw;
+  }
+
+  .hs-card {
+    height: auto;
+    min-height: 360px;
   }
 
   .wa-float {

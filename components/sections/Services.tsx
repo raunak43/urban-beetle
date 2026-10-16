@@ -1,6 +1,8 @@
 import { services } from "@/lib/content";
 import { Eyebrow, Words, pad2 } from "../Text";
 
+// The services as a horizontal row of cards, each linking to its own page. On desktop the row is pinned and
+// slides sideways as you scroll (MotionEffects, data-hscroll); on touch screens it's swiped.
 export default function Services() {
   return (
     <section className="services section" id="services">
@@ -14,35 +16,37 @@ export default function Services() {
             Nine disciplines under one roof, so strategy, creative and performance never lose each other in a handoff.
           </p>
         </header>
+      </div>
 
-        <ol className="service-list">
+      <div className="hs" data-hscroll="">
+        <ol className="hs__track" data-reveal="stagger">
           {services.map((s, i) => (
-            <li key={s.name} className="service" data-reveal="">
-              <span className="service__num">{pad2(i + 1)}</span>
-              <h3 className="service__name">
-                {/* The link covers the whole row (see .service__link) and leads to the service's own page. */}
-                <a href={`/services/${s.slug}`} className="service__link">
-                  <span className="service__name-text" data-text={s.name}>
-                    {s.name}
+            <li key={s.slug} className="hs__item">
+              <a href={`/services/${s.slug}`} className="hs-card glow-card">
+                <span className="hs-card__top">
+                  <span>{pad2(i + 1)}</span>
+                  <span className="hs-card__arrow" aria-hidden="true">
+                    ↗
                   </span>
-                </a>
-              </h3>
-              <div className="service__detail">
-                <div>
-                  <p>{s.body}</p>
-                  <ul className="tags">
-                    {s.tags.map((t) => (
-                      <li key={t}>{t}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <span className="service__arrow" aria-hidden="true">
-                ↗
-              </span>
+                </span>
+                <h3 className="hs-card__name">{s.name}</h3>
+                <span className="hs-card__body">{s.body}</span>
+                <span className="hs-card__tags">
+                  {s.tags.map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </span>
+              </a>
             </li>
           ))}
         </ol>
+        <div className="container hs__foot" aria-hidden="true">
+          <span className="hs__progress">
+            <i />
+          </span>
+          <span className="hs__hint hs__hint--scroll">Scroll to explore →</span>
+          <span className="hs__hint hs__hint--swipe">Swipe to explore →</span>
+        </div>
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion } from "@/lib/motion";
+import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion, scrollToTarget } from "@/lib/motion";
 
 // Wires up the declarative animation attributes used throughout the page:
 //   data-reveal / data-reveal="stagger"   fade + rise when scrolled into view
@@ -9,10 +9,12 @@ import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion } from "@/li
 //   data-scrub-words                      words brighten as the reader scrolls through
 //   data-parallax="0.15"                  drifts against the scroll
 //   data-clip                             wipes open from the bottom
+//   data-hscroll                          a horizontal row (Capabilities): pinned and scrolled sideways on desktop
 // plus the top scroll-progress line and the pointer glow on .glow-card elements.
 export default function MotionEffects() {
   useEffect(() => {
     const reduced = prefersReducedMotion();
+    const cleanups: (() => void)[] = [];
 
     const ctx = gsap.context(() => {
       const all = <T extends Element = HTMLElement>(sel: string) => gsap.utils.toArray<T>(sel);
@@ -21,6 +23,60 @@ export default function MotionEffects() {
         scaleX: 1,
         ease: "none",
         scrollTrigger: { start: 0, end: "max", scrub: 0.3 },
+      });
+
+      // Horizontal rows. Swiped natively by default; with a mouse and full motion, the row is pinned
+      // while the page scrolls and slides sideways instead. The thin line under it shows how far along it is.
+      all("[data-hscroll]").forEach((row) => {
+        const track = row.querySelector<HTMLElement>(".hs__track")!;
+        const bar = row.querySelector<HTMLElement>(".hs__progress i");
+        const show = (progress: number) => bar && gsap.set(bar, { scaleX: progress });
+
+        const onSwipe = () => {
+          const room = track.scrollWidth - track.clientWidth;
+          show(room > 0 ? track.scrollLeft / room : 1);
+        };
+        track.addEventListener("scroll", onSwipe, { passive: true });
+        onSwipe();
+        cleanups.push(() => track.removeEventListener("scroll", onSwipe));
+
+        const mm = gsap.matchMedia();
+        mm.add("(min-width: 900px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
+          row.classList.add("is-pinned");
+          const distance = () => Math.max(0, track.scrollWidth - row.clientWidth);
+          const slide = gsap.to(track, {
+            x: () => -distance(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: row,
+              start: "center center",
+              end: () => `+=${distance()}`,
+              pin: true,
+              scrub: 0.6,
+              invalidateOnRefresh: true,
+              onUpdate: (st) => show(st.progress),
+            },
+          });
+          show(0);
+
+          // Tabbing to a card that's off to the side scrolls the page to where that card is in view.
+          const onFocus = (e: FocusEvent) => {
+            const item = (e.target as HTMLElement).closest<HTMLElement>(".hs__item");
+            const st = slide.scrollTrigger;
+            if (!item || !st) return;
+            const offset = Math.min(distance(), Math.max(0, item.offsetLeft + item.offsetWidth - row.clientWidth + 40));
+            const shown = -gsap.getProperty(track, "x") as number;
+            if (item.offsetLeft < shown || item.offsetLeft + item.offsetWidth > shown + row.clientWidth)
+              scrollToTarget(st.start + offset);
+          };
+          track.addEventListener("focusin", onFocus);
+
+          return () => {
+            track.removeEventListener("focusin", onFocus);
+            row.classList.remove("is-pinned");
+          };
+        });
+        cleanups.push(() => mm.revert());
       });
 
       if (reduced) return;
@@ -110,6 +166,7 @@ export default function MotionEffects() {
 
     return () => {
       document.removeEventListener("pointermove", onPointer);
+      cleanups.forEach((fn) => fn());
       ctx.revert();
     };
   }, []);
