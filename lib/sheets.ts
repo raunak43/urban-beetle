@@ -1,5 +1,5 @@
 import "server-only";
-import { BUDGETS, DURATIONS, REFERRALS, SERVICES, START_TIMELINES, labelOf, type EnquiryInput } from "./enquiry";
+import { BUDGETS, DURATIONS, REFERRALS, SERVICES, START_TIMELINES, labelOf, mapsLink, type EnquiryInput } from "./enquiry";
 import { photoLabel, type EnquiryPhoto } from "./photos";
 
 // Adds each enquiry as a row in a Google Sheet, through the small Apps Script web app in
@@ -27,6 +27,8 @@ export const SHEET_COLUMNS = [
   "Additional information",
   "Heard about us via",
   "Photos",
+  // Added later than the rest, so it goes last: rows already in the sheet keep their columns.
+  "Location (Google Maps)",
 ] as const;
 
 function row(e: EnquiryInput, reference: string, photos: EnquiryPhoto[]): string[] {
@@ -55,6 +57,7 @@ function row(e: EnquiryInput, reference: string, photos: EnquiryPhoto[]): string
     e.additional_information,
     e.referral_source ? labelOf(REFERRALS, e.referral_source) : "",
     photos.length ? `${photos.map((p) => photoLabel(p.slot)).join(", ")} (sent to Telegram and WhatsApp)` : "",
+    mapsLink(e.business_location),
   ];
 }
 

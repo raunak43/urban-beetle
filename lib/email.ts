@@ -1,7 +1,7 @@
 import "server-only";
 import nodemailer from "nodemailer";
 import { site } from "./content";
-import { BUDGETS, SERVICES, START_TIMELINES, labelOf, type EnquiryInput } from "./enquiry";
+import { BUDGETS, SERVICES, START_TIMELINES, isMapsPin, labelOf, type EnquiryInput } from "./enquiry";
 import { photoLabel, type EnquiryPhoto } from "./photos";
 
 // The confirmation email a client gets after submitting the enquiry form. It's sent through the Titan
@@ -55,6 +55,9 @@ export function confirmationEmail(e: EnquiryInput, reference: string, photos: En
   const summary: [string, string][] = [
     ["Reference", reference],
     ["Company", e.company_name],
+    ...(e.business_location
+      ? [["Location", isMapsPin(e.business_location) ? "Pinned on Google Maps" : e.business_location] as [string, string]]
+      : []),
     ["Services", services],
     ["Budget", labelOf(BUDGETS, e.budget)],
     ["Start", labelOf(START_TIMELINES, e.start_timeline)],

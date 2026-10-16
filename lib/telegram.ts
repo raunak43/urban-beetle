@@ -6,6 +6,7 @@ import {
   SERVICES,
   START_TIMELINES,
   labelOf,
+  mapsLink,
   type EnquiryInput,
 } from "./enquiry";
 import type { EnquiryPhoto } from "./photos";
@@ -43,6 +44,8 @@ export function formatEnquiryMessage(e: EnquiryInput, reference: string, supabas
     line("Email", e.email) +
     line("Phone", e.phone) +
     line("City", e.city) +
+    // Never clipped: a shortened link wouldn't open.
+    (e.business_location ? `<b>Map:</b> ${escape(mapsLink(e.business_location))}\n` : "") +
     line("Website", e.website) +
     line("Social", e.social_media) +
     `\n<b>🧩 SERVICES</b>\n${escape(services)}\n` +

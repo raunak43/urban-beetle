@@ -3,14 +3,14 @@ import type { NextConfig } from "next";
 const turnstile = "https://challenges.cloudflare.com"; // Cloudflare's security check on the enquiry form
 
 // The browser loads this site's own files (fonts, images and scripts are all self-hosted) plus Cloudflare's
-// security check (a script and its frame), and nothing else. Inline scripts and styles stay allowed because
-// Next.js and React need them.
+// security check (a script and its frame) and the enquiry form's Google Maps preview (a frame), and nothing
+// else. Inline scripts and styles stay allowed because Next.js and React need them.
 // Skipped in development (hot reloading uses eval and a websocket) and on Vercel preview deployments, which
 // are login-protected and inject Vercel's toolbar.
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' ${turnstile}`,
-  `frame-src ${turnstile}`,
+  `frame-src ${turnstile} https://www.google.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
@@ -29,7 +29,7 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), browsing-topics=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 

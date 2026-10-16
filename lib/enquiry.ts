@@ -67,6 +67,7 @@ export type EnquiryInput = {
   email: string;
   phone: string;
   city: string;
+  business_location: string;
   website: string;
   social_media: string;
   services_required: string[];
@@ -91,6 +92,7 @@ export const EMPTY_ENQUIRY: EnquiryInput = {
   email: "",
   phone: "",
   city: "",
+  business_location: "",
   website: "",
   social_media: "",
   services_required: [],
@@ -112,6 +114,7 @@ export const MAX_LENGTH: Partial<Record<Field, number>> = {
   email: 254,
   phone: 20,
   city: 120,
+  business_location: 500,
   website: 300,
   social_media: 300,
   services_other: 200,
@@ -125,7 +128,11 @@ export const MAX_LENGTH: Partial<Record<Field, number>> = {
 // Form sections, in order, with the fields each one owns (used for progress and error navigation).
 // "photos" owns no text fields: its uploads live in lib/photos.ts.
 export const SECTIONS: { id: string; title: string; fields: Field[]; optional?: boolean }[] = [
-  { id: "about", title: "About you", fields: ["full_name", "company_name", "email", "phone", "city", "website", "social_media"] },
+  {
+    id: "about",
+    title: "About you",
+    fields: ["full_name", "company_name", "email", "phone", "city", "website", "social_media", "business_location"],
+  },
   { id: "needs", title: "What do you need?", fields: ["services_required", "services_other"] },
   {
     id: "project",
@@ -141,6 +148,55 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_RE = /^\+?[0-9 ()-]{7,20}$/;
 const HANDLE_RE = /^@[A-Za-z0-9._]{1,30}$/;
 // Control characters other than tab / newline.
+// ---------- Business location (Google Maps) ----------
+// The client can type an address, paste a Google Maps link, or share their coordinates ("lat,lng") with
+// "Use my current location". These helpers turn any of them into a Maps link and a map preview.
+
+const looksLikeLink = (value: string) => /^(https?:\/\/|www\.|maps\.)|goo\.gl\//i.test(value.trim());
+
+/** The value as a Google Maps URL, or null if it isn't a link to Google Maps. */
+function mapsUrl(value: string): URL | null {
+  const v = value.trim();
+  let url: URL;
+  try {
+    url = new URL(/^https?:\/\//i.test(v) ? v : `https://${v}`);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  const host = url.hostname.toLowerCase();
+  if (host === "maps.app.goo.gl") return url;
+  if (host === "goo.gl") return url.pathname.startsWith("/maps") ? url : null;
+  if (/^maps\.google\.[a-z.]+$/.test(host)) return url;
+  if (/^(www\.)?google\.[a-z.]+$/.test(host)) return url.pathname.startsWith("/maps") ? url : null;
+  return null;
+}
+
+/** A link that opens the client's business location in Google Maps ("" when none was given). */
+export function mapsLink(value: string) {
+  const v = value.trim();
+  if (!v) return "";
+  return mapsUrl(v)?.href ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v)}`;
+}
+
+/** True when the location is a pin (a Maps link or coordinates) rather than a typed address. */
+export const isMapsPin = (value: string) => !!mapsUrl(value) || /^-?\d{1,2}\.\d+,\s*-?\d{1,3}\.\d+$/.test(value.trim());
+
+/** What to show on the form's map preview, or null when it can't be previewed (e.g. a short maps.app.goo.gl link). */
+export function mapsPreviewQuery(value: string): string | null {
+  const v = value.trim();
+  if (v.length < 3) return null;
+  if (!looksLikeLink(v)) return v;
+  const url = mapsUrl(v);
+  if (!url) return null;
+  const at = url.pathname.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (at) return `${at[1]},${at[2]}`;
+  const q = url.searchParams.get("q") ?? url.searchParams.get("query");
+  if (q) return q;
+  const place = url.pathname.match(/\/maps\/place\/([^/]+)/);
+  return place ? decodeURIComponent(place[1].replace(/\+/g, " ")) : null;
+}
+
 const CONTROL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
 const isOneOf = (options: Option[], value: string) => options.some((o) => o.value === value);
@@ -173,6 +229,8 @@ export function validateEnquiry(v: EnquiryInput): FieldErrors {
   if (len(v.website) && !normaliseUrl(v.website)) e.website = "Enter a valid website, e.g. yourbrand.com.";
   if (len(v.social_media) && !HANDLE_RE.test(v.social_media.trim()) && !normaliseUrl(v.social_media))
     e.social_media = "Enter a profile link or an @handle.";
+  if (looksLikeLink(v.business_location) && !mapsUrl(v.business_location))
+    e.business_location = "Please paste a Google Maps link, or type your address instead.";
 
   if (!v.services_required.length) e.services_required = "Select at least one service.";
   else if (v.services_required.some((s) => !isOneOf(SERVICES, s))) e.services_required = "Please choose from the list.";

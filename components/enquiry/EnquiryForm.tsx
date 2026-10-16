@@ -20,6 +20,7 @@ import { phoneHref, site } from "@/lib/content";
 import { photoField } from "@/lib/photos";
 import PhotoPicker, { usePhotos } from "./PhotoPicker";
 import SuccessScreen from "./SuccessScreen";
+import LocationField from "./LocationField";
 import Turnstile, { type TurnstileHandle } from "./Turnstile";
 
 const DRAFT_KEY = "ub-enquiry-draft";
@@ -30,6 +31,7 @@ const LABELS: Record<Field, string> = {
   email: "Work email",
   phone: "Phone number",
   city: "City / location",
+  business_location: "Business location",
   website: "Website URL",
   social_media: "Instagram / social media",
   services_required: "Services",
@@ -379,6 +381,12 @@ export default function EnquiryForm({ turnstileSiteKey }: { turnstileSiteKey?: s
                 placeholder: "instagram.com/yourbrand or @yourbrand",
                 wide: true,
               })}
+              <LocationField
+                value={values.business_location}
+                onChange={(v) => set("business_location", v)}
+                onBlur={() => touch("business_location")}
+                error={shown("business_location")}
+              />
             </div>
           </Section>
 
