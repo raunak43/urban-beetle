@@ -52,7 +52,7 @@ export function PageFooter() {
         </div>
       </div>
       <p className="pg-foot__legal">
-        © {new Date().getFullYear()} Urban Beetle. All rights reserved. · <a href="/privacy">Privacy policy</a>
+        © {new Date().getFullYear()} Urban Beetle. All rights reserved. · <a href="/privacy">Privacy policy</a> · <a href="/terms">Terms</a>
       </p>
     </footer>
   );

@@ -67,7 +67,7 @@ export default function Footer() {
 
       <div className="container footer__bottom">
         <span>
-          © {new Date().getFullYear()} Urban Beetle. All rights reserved. · <a href="/privacy">Privacy policy</a>
+          © {new Date().getFullYear()} Urban Beetle. All rights reserved. · <a href="/privacy">Privacy policy</a> · <a href="/terms">Terms</a>
         </span>
         <span className="footer__motto">Made to move.</span>
         <a href="#top" className="footer__top-link">

@@ -605,6 +605,10 @@ export default function EnquiryForm({ turnstileSiteKey }: { turnstileSiteKey?: s
                 your enquiry (see our{" "}
                 <a href="/privacy" target="_blank">
                   privacy policy
+                </a>{" "}
+                and{" "}
+                <a href="/terms" target="_blank">
+                  terms
                 </a>
                 ).
               </p>
