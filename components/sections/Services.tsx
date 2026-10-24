@@ -48,6 +48,13 @@ export default function Services() {
           <span className="hs__hint hs__hint--swipe">Swipe to explore →</span>
         </div>
       </div>
+
+      <p className="container services__next" data-reveal="">
+        Not sure which you need?
+        <a href="/enquiry" className="link-arrow">
+          Tell us your goals <span aria-hidden="true">→</span>
+        </a>
+      </p>
     </section>
   );
 }

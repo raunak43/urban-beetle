@@ -6,17 +6,20 @@ import { Eyebrow, pad2 } from "../Text";
 
 const INTERVAL_MS = 7000;
 
-export default function Testimonials() {
+// Hidden until lib/content.ts has real client testimonials. `index` is the section number shown in its eyebrow.
+export default function Testimonials({ index }: { index: string }) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const total = testimonials.length;
   const go = (i: number) => setActive((i + total) % total);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || total < 2) return;
     const id = window.setTimeout(() => setActive((a) => (a + 1) % total), INTERVAL_MS);
     return () => window.clearTimeout(id);
   }, [active, paused, total]);
+
+  if (!total) return null;
 
   return (
     <section
@@ -28,7 +31,7 @@ export default function Testimonials() {
       onBlurCapture={() => setPaused(false)}
     >
       <div className="container">
-        <Eyebrow index="06">Client Voices</Eyebrow>
+        <Eyebrow index={index}>Client Voices</Eyebrow>
         {/* Only announce changes the visitor caused, not every autoplay tick. */}
         <div className="voices__stage" aria-live={paused ? "polite" : "off"} data-reveal="">
           <span className="voices__mark" aria-hidden="true">

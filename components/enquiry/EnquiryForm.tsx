@@ -816,12 +816,15 @@ function Choices({
   };
 
   return (
+    // Single choices are a radiogroup, which supports aria-required/aria-invalid; a plain group of checkboxes
+    // doesn't, so there each checkbox carries aria-invalid instead.
     <fieldset
       id={`f-${field}`}
       className={`eq-choices eq-choices--${variant}${error ? " has-error" : ""}`}
+      role={multiple ? undefined : "radiogroup"}
       aria-describedby={`e-${field}`}
-      aria-invalid={!!error || undefined}
-      aria-required={required || undefined}
+      aria-invalid={(!multiple && !!error) || undefined}
+      aria-required={(!multiple && required) || undefined}
     >
       <Label field={field} label={legend} required={required} optional={optional} as="legend" />
       {multiple && (
@@ -837,6 +840,7 @@ function Choices({
               name={field}
               value={o.value}
               checked={selected(o.value)}
+              aria-invalid={(multiple && !!error) || undefined}
               onChange={() => toggle(o.value)}
               onClick={(e) => {
                 // Lets an optional single choice be un-selected by clicking it again.

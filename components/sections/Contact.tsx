@@ -2,12 +2,12 @@ import { phoneHref, site, whatsappHref } from "@/lib/content";
 import IconLink from "../IconLink";
 import { Eyebrow, Words } from "../Text";
 
-export default function Contact() {
+export default function Contact({ index }: { index: string }) {
   return (
     <section className="contact section" id="contact">
       <div className="container contact__grid">
         <div className="contact__intro">
-          <Eyebrow index="07">Contact</Eyebrow>
+          <Eyebrow index={index}>Contact</Eyebrow>
           <h2 className="section-title" data-split="">
             <Words parts={["Tell us where", "you want to", { em: "go." }]} />
           </h2>

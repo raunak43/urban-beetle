@@ -183,25 +183,40 @@ export const process = [
   },
 ];
 
-// PLACEHOLDER: these quotes are sample copy. Replace with real, approved client testimonials.
-export const testimonials = [
+// Real, approved client testimonials only (invented reviews mislead visitors and break India's consumer rules).
+// The "Client voices" section stays hidden while this list is empty. Add entries like:
+//   { quote: "What the client said.", name: "Priya Shah", role: "Founder, Sunrise Bakery" },
+export const testimonials: { quote: string; name: string; role: string }[] = [];
+
+// Questions people ask before enquiring, answered on the home page (and given to search engines as FAQ data).
+export const faqs = [
   {
-    quote:
-      "Urban Beetle did not just redesign our brand, they gave it a personality. Customers recognise us instantly now.",
-    name: "Founder",
-    role: "Restaurant brand",
+    q: "What does Urban Beetle do?",
+    a: "We're a creative marketing agency. We help businesses grow through branding, website design, social media, content and reels, Google and Meta ads, photography, SEO, influencer marketing and graphic design, either as single services or as one joined-up plan.",
   },
   {
-    quote:
-      "The content quality jumped overnight. Our social channels finally look like the premium label we always wanted to be.",
-    name: "Creative Director",
-    role: "Fashion label",
+    q: "Where are you based, and which areas do you serve?",
+    a: "We're based in Kalyan, Maharashtra, and work with businesses in Dombivli, Thane, Navi Mumbai and Mumbai, and with brands across India, in person or online.",
   },
   {
-    quote:
-      "Strategy, creative and ads under one roof, and every rupee is accounted for. It is the partnership we were missing.",
-    name: "Managing Director",
-    role: "Retail business",
+    q: "How much do your services cost?",
+    a: "Every project is priced on its scope, so there's no one-size price list. Share your goals and budget range in the enquiry form, and we'll send a clear proposal with exactly what's included.",
+  },
+  {
+    q: "Can we start with just one service?",
+    a: "Yes. You can start with a single service, such as a website or social media management, and add more as your business grows.",
+  },
+  {
+    q: "How soon will you get back to me?",
+    a: "Within 24 hours. A member of our team will reply personally by phone, WhatsApp or email.",
+  },
+  {
+    q: "How long before we see results?",
+    a: "It depends on the service. Ads can bring enquiries within days, social media usually builds over three to six months, and SEO compounds over months. We agree goals up front and report on them clearly.",
+  },
+  {
+    q: "How do we get started?",
+    a: "Fill in the project enquiry form, which takes about five minutes, or message us on WhatsApp. We'll set up a short call to understand your business and goals.",
   },
 ];
 

@@ -429,6 +429,20 @@
   color: var(--muted);
 }
 
+/* 404 page */
+.sp-404 {
+  min-height: 62vh;
+}
+
+.sp-404__help {
+  margin: 32px 0 0;
+  color: var(--muted);
+}
+
+.sp-404__help a {
+  color: var(--gold);
+}
+
 /* Long-form text (privacy policy) */
 .sp-prose {
   max-width: 760px;

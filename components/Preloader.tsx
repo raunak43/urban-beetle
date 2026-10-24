@@ -5,6 +5,9 @@ import BeetleMark from "./BeetleMark";
 import { gsap, loader } from "@/lib/motion";
 
 const MIN_VISIBLE_MS = 1400;
+// Once the intro has played in this browser tab, returning to the home page (e.g. from a service page)
+// doesn't hold the preloader for its minimum time; it leaves as soon as the frames and fonts are ready.
+const SEEN_KEY = "ub-intro-seen";
 const FONT_WAIT_MS = 2500;
 
 export default function Preloader() {
@@ -17,6 +20,11 @@ export default function Preloader() {
     // Scrolling stays locked while the preloader is up (only pages with a preloader get this).
     document.documentElement.classList.add("is-loading");
     const started = performance.now();
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(SEEN_KEY) === "1";
+    } catch {}
+    const minVisible = seen ? 0 : MIN_VISIBLE_MS;
     const shown = { value: 0 };
     let leaving = false;
 
@@ -41,7 +49,10 @@ export default function Preloader() {
         new Promise((resolve) => setTimeout(resolve, FONT_WAIT_MS)),
       ]);
       if (cancelled) return;
-      const wait = Math.max(0, MIN_VISIBLE_MS - (performance.now() - started)) / 1000;
+      const wait = Math.max(0, minVisible - (performance.now() - started)) / 1000;
+      try {
+        sessionStorage.setItem(SEEN_KEY, "1");
+      } catch {}
       gsap
         .timeline({ delay: wait })
         .add(chase(1, 0.5))
