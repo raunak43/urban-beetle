@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap, prefersReducedMotion } from "@/lib/motion";
+import { gsap, prefersReducedMotion, spring } from "@/lib/motion";
 
-// Endless ticker that speeds up with scroll velocity and follows the scroll direction.
+// Endless ticker that speeds up with scroll velocity and follows the scroll direction. The letters lean
+// into the motion as it speeds up and wobble back upright when the scroll stops.
 export default function Marquee({
   items,
   speed = 0.035,
@@ -27,6 +28,7 @@ export default function Marquee({
     let boost = 0;
     let lastY = window.scrollY;
     let visible = false;
+    const lean = spring(1.4, 0.22);
 
     const tick = (_t: number, dt: number) => {
       if (!visible) return;
@@ -39,7 +41,8 @@ export default function Marquee({
       x += dir * (speed + boost) * (dt / 16.67);
       if (x <= -50) x += 50;
       else if (x > 0) x -= 50;
-      track.style.transform = `translate3d(${x}%,0,0)`;
+      const skew = lean.step(-dir * Math.min(Math.abs(delta) * 0.3, 12), dt);
+      track.style.transform = `translate3d(${x}%,0,0) skewX(${skew.toFixed(2)}deg)`;
     };
     gsap.ticker.add(tick);
     const io = new IntersectionObserver(([entry]) => {

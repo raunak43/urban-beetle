@@ -17,7 +17,7 @@ export default function Why() {
           </p>
         </header>
 
-        <div className="why__grid" data-reveal="stagger">
+        <div className="why__grid" data-reveal="flip">
           {reasons.map((r, i) => (
             <article key={r.title} className="why__card glow-card">
               <span className="why__num">{pad2(i + 1)}</span>

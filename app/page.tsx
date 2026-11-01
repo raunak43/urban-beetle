@@ -1,6 +1,7 @@
 import Cursor from "@/components/Cursor";
 import FocusBlur from "@/components/FocusBlur";
 import HeroSequence from "@/components/HeroSequence";
+import LiveMotion from "@/components/LiveMotion";
 import Marquee from "@/components/Marquee";
 import MotionEffects from "@/components/MotionEffects";
 import Nav from "@/components/Nav";
@@ -62,6 +63,7 @@ export default function Home() {
       <Footer />
       <FocusBlur />
       <MotionEffects />
+      <LiveMotion />
     </>
   );
 }

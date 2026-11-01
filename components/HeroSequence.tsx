@@ -5,6 +5,7 @@ import frames from "@/lib/frames.json";
 import BeetleMark from "./BeetleMark";
 import Particles from "./Particles";
 import { gsap, loader, isTouch, prefersReducedMotion } from "@/lib/motion";
+import { buildLoadOrder } from "@/lib/sequence";
 
 // Share of the hero's scroll distance spent playing the video; the rest holds on the landed beetle.
 const FRAME_END = 0.9;
@@ -15,6 +16,10 @@ const BG = "#070707";
 const BG_CLEAR = "rgba(7,7,7,0)";
 const CONCURRENCY = 6;
 const FAILSAFE_MS = 12000;
+// When scrolling stops, the video keeps rocking this far either side of where it stopped (a share of
+// the whole video, so phones' half-length sequence rocks over the same stretch of time).
+const ROCK = 0.014;
+const IDLE_AFTER_MS = 260;
 
 const CHAPTERS: [number, string][] = [
   [0, "Intro"],
@@ -23,27 +28,6 @@ const CHAPTERS: [number, string][] = [
   [0.41, "The City"],
   [0.72, "Arrival"],
 ];
-
-// Load order for progressive quality: a coarse pass across the whole video first (so scrubbing works
-// almost immediately), then fill the gaps. The coarse pass is what the preloader waits for.
-function buildLoadOrder(count: number) {
-  const order: number[] = [];
-  const seen = new Uint8Array(count);
-  const push = (i: number) => {
-    if (!seen[i]) {
-      seen[i] = 1;
-      order.push(i);
-    }
-  };
-  push(0);
-  push(count - 1);
-  let critical = 0;
-  for (const stride of [16, 8, 4, 2, 1]) {
-    for (let i = 0; i < count; i += stride) push(i);
-    if (stride === 8) critical = order.length;
-  }
-  return { order, critical };
-}
 
 const Chars = ({ text }: { text: string }) => (
   <span className="split-chars" aria-hidden="true">
@@ -108,7 +92,8 @@ export default function HeroSequence() {
     const failsafe = window.setTimeout(() => loader.setReady(), FAILSAFE_MS);
 
     // ---------- drawing ----------
-    const view = { frame: 0, zoom: 1 };
+    // `frame` follows the scroll; `rock` is the idle sway added on top (see the living scene below).
+    const view = { frame: 0, zoom: 1, rock: 0 };
     let cw = 0;
     let ch = 0;
     let lastIdx = -1;
@@ -124,7 +109,11 @@ export default function HeroSequence() {
     };
 
     function draw(force = false) {
-      const idx = nearestLoaded(Math.min(count - 1, Math.max(0, Math.round(view.frame))));
+      // The sway bounces off the ends of the video rather than stalling there.
+      let f = view.frame + view.rock;
+      if (f < 0) f = -f;
+      else if (f > count - 1) f = 2 * (count - 1) - f;
+      const idx = nearestLoaded(Math.min(count - 1, Math.max(0, Math.round(f))));
       if (idx < 0 || !cw) return;
       if (!force && idx === lastIdx && view.zoom === lastZoom) return;
       lastIdx = idx;
@@ -164,9 +153,9 @@ export default function HeroSequence() {
     const resize = () => {
       // Phones get a slightly lighter canvas (1.5x) so every frame draws fast.
       const dpr = Math.min(window.devicePixelRatio || 1, isTouch() ? 1.5 : 2);
-      const rect = canvas.getBoundingClientRect();
-      cw = canvas.width = Math.max(1, Math.round(rect.width * dpr));
-      ch = canvas.height = Math.max(1, Math.round(rect.height * dpr));
+      // Layout size, not the on-screen box: the camera float scales the canvas slightly.
+      cw = canvas.width = Math.max(1, Math.round(canvas.clientWidth * dpr));
+      ch = canvas.height = Math.max(1, Math.round(canvas.clientHeight * dpr));
       draw(true);
     };
     const ro = new ResizeObserver(resize);
@@ -175,6 +164,59 @@ export default function HeroSequence() {
     // ---------- animation ----------
     const reduced = prefersReducedMotion();
     let chapter = -1;
+
+    // ---------- living scene ----------
+    // The hero never freezes. When scrolling stops, the video keeps rocking gently around the moment it
+    // stopped on, so the dust keeps swirling and the wings keep beating. The camera floats, leans toward
+    // the pointer on desktop and pushes in a little while you scroll fast, and the dust layer moves the
+    // other way for depth. Scrolling hands the video straight back to the scroll.
+    const dust = section.querySelector<HTMLElement>(".hero__particles");
+    const rockFrames = count * ROCK;
+    let inView = false;
+    let lastY = window.scrollY;
+    let lastScroll = 0;
+    let amp = 0;
+    let punch = 0;
+    let px = 0;
+    let py = 0;
+    let lx = 0;
+    let ly = 0;
+
+    const onPointer = (e: PointerEvent) => {
+      px = (e.clientX / window.innerWidth) * 2 - 1;
+      py = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (fine && !reduced) window.addEventListener("pointermove", onPointer, { passive: true });
+
+    const live = (_time: number, dt: number) => {
+      if (!inView) return;
+      const now = performance.now();
+      const ease = (ms: number) => 1 - Math.exp(-dt / ms);
+      const y = window.scrollY;
+      const speed = (Math.abs(y - lastY) / Math.max(dt, 1)) * 1000;
+      if (y !== lastY) lastScroll = now;
+      lastY = y;
+
+      const still = now - lastScroll > IDLE_AFTER_MS;
+      amp += ((still ? rockFrames : 0) - amp) * ease(still ? 900 : 90);
+      const t = now / 1000;
+      view.rock = amp * (0.8 * Math.sin(t * 1.9) + 0.2 * Math.sin(t * 4.3 + 1));
+      draw();
+
+      punch += (Math.min(speed / 5000, 0.04) - punch) * ease(300);
+      lx += (px - lx) * ease(600);
+      ly += (py - ly) * ease(600);
+      const cx = lx * 14 + Math.sin(t * 0.5) * 6;
+      const cy = ly * 10 + Math.sin(t * 0.37 + 1) * 5;
+      canvas.style.transform = `translate3d(${(-cx).toFixed(2)}px,${(-cy).toFixed(2)}px,0) scale(${(1.04 + punch).toFixed(4)})`;
+      if (dust) dust.style.transform = `translate3d(${(cx * 0.9).toFixed(2)}px,${(cy * 0.9).toFixed(2)}px,0)`;
+    };
+    const seen = new IntersectionObserver(([entry]) => (inView = entry.isIntersecting));
+    if (!reduced) {
+      seen.observe(section);
+      gsap.ticker.add(live);
+    }
 
     const gctx = gsap.context(() => {
       const q = gsap.utils.selector(section);
@@ -248,6 +290,9 @@ export default function HeroSequence() {
       cancelled = true;
       window.clearTimeout(failsafe);
       ro.disconnect();
+      seen.disconnect();
+      gsap.ticker.remove(live);
+      window.removeEventListener("pointermove", onPointer);
       gctx.revert();
     };
   }, []);

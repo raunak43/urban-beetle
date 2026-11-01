@@ -1,8 +1,9 @@
-// Turns the hero video into WebP image sequences for the scroll animation,
-// plus a few still frames reused as the recurring beetle visual.
+// Turns a scroll-scene video into WebP image sequences for the scroll animation: the hero (plus a few
+// still frames reused as the recurring beetle visual), or the closing take-off scene behind the CTA.
 //
 // Usage:
-//   npm run frames -- path/to/video.mp4
+//   npm run frames -- assets/beetle-hero.mp4
+//   npm run frames -- assets/beetle-takeoff.mp4 takeoff
 // Needs ffmpeg on PATH, or set FFMPEG_PATH to an ffmpeg executable.
 
 import { execFileSync } from "node:child_process";
@@ -12,27 +13,48 @@ import path from "node:path";
 
 const ffmpeg = process.env.FFMPEG_PATH || "ffmpeg";
 const input = process.argv[2];
-if (!input) {
-  console.error("Usage: npm run frames -- <video.mp4>");
-  process.exit(1);
-}
+const scene = process.argv[3] || "hero";
 
-// Desktop gets every frame; phones get every 2nd frame at a smaller size.
-const variants = [
-  { name: "desktop", width: 1600, step: 1, quality: 75 },
-  { name: "mobile", width: 1280, step: 2, quality: 72 },
-];
-
-// Source frame numbers (24fps) used as standalone beetle images.
-const stills = {
-  profile: 72, // clean side view (About)
-  landed: 239, // final pose on the plinth (CTA, social share image)
+const scenes = {
+  hero: {
+    // Desktop gets every frame; phones get every 2nd frame at a smaller size.
+    variants: [
+      { name: "desktop", width: 1600, step: 1, quality: 75 },
+      { name: "mobile", width: 1280, step: 2, quality: 72 },
+    ],
+    // Source frame numbers (24fps) used as standalone beetle images.
+    stills: {
+      profile: 72, // clean side view (About)
+    },
+    // Box (in source-video pixels) containing the generator's small corner logo, which is painted out
+    // of every frame. The exact logo pixels inside the box are detected automatically; set to null for
+    // a video without one.
+    cornerMark: { x: 1694, y: 854, size: 92 },
+    prefilter: "",
+    dir: "public/frames",
+    manifest: "lib/frames.json",
+  },
+  takeoff: {
+    // Shown dimmed behind the closing headline, so fewer, smaller and slightly soft frames are plenty
+    // (the gold dust is costly to compress; the page cross-fades between frames to keep it smooth).
+    variants: [
+      { name: "desktop", width: 1280, step: 3, quality: 60 },
+      { name: "mobile", width: 860, step: 4, quality: 58 },
+    ],
+    stills: {},
+    // Flow's small "Veo" mark sits on a smooth glow here, so a plain delogo blends it away.
+    cornerMark: null,
+    prefilter: "delogo=x=1858:y=1036:w=46:h=28,gblur=sigma=1.2",
+    dir: "public/frames/takeoff",
+    manifest: "lib/frames-takeoff.json",
+  },
 };
 
-// Box (in source-video pixels) containing the generator's small corner logo, which is painted out
-// of every frame. The exact logo pixels inside the box are detected automatically; set to null for
-// a video without one.
-const cornerMark = { x: 1694, y: 854, size: 92 };
+if (!input || !scenes[scene]) {
+  console.error(`Usage: npm run frames -- <video.mp4> [${Object.keys(scenes).join(" | ")}]`);
+  process.exit(1);
+}
+const { variants, stills, cornerMark, prefilter, dir: framesDir, manifest: manifestPath } = scenes[scene];
 
 const ffmpegRun = (args, options = {}) =>
   execFileSync(ffmpeg, ["-v", "error", "-y", ...args], { maxBuffer: 1 << 30, ...options });
@@ -159,7 +181,7 @@ const render = (filters, outputArgs) => {
   ffmpegRun([...inputs, "-an", "-filter_complex", graph, "-map", "[out]", ...outputArgs]);
 };
 
-const framesRoot = path.resolve("public/frames");
+const framesRoot = path.resolve(framesDir);
 // The version busts the long-lived browser cache whenever frames are regenerated.
 const manifest = { version: Date.now().toString(36) };
 
@@ -167,13 +189,13 @@ for (const v of variants) {
   const dir = path.join(framesRoot, v.name);
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
-  render(`select='not(mod(n\\,${v.step}))',scale=${v.width}:-2:flags=lanczos`, [
+  render(`select='not(mod(n\\,${v.step}))',${prefilter ? `${prefilter},` : ""}scale=${v.width}:-2:flags=lanczos`, [
     "-fps_mode", "vfr",
     "-c:v", "libwebp", "-quality", String(v.quality), "-compression_level", "6",
     path.join(dir, "%04d.webp"),
   ]);
   const count = readdirSync(dir).filter((f) => f.endsWith(".webp")).length;
-  manifest[v.name] = { count, path: `/frames/${v.name}` };
+  manifest[v.name] = { count, path: `/${path.posix.relative("public", framesDir)}/${v.name}` };
   console.log(`${v.name}: ${count} frames`);
 }
 
@@ -186,7 +208,7 @@ for (const [name, frame] of Object.entries(stills)) {
     path.join(stillsDir, `beetle-${name}.webp`),
   ]);
 }
-console.log(`stills: ${Object.keys(stills).join(", ")}`);
+if (Object.keys(stills).length) console.log(`stills: ${Object.keys(stills).join(", ")}`);
 
 if (patches) rmSync(patches, { force: true });
-writeFileSync(path.resolve("lib/frames.json"), JSON.stringify(manifest, null, 2) + "\n");
+writeFileSync(path.resolve(manifestPath), JSON.stringify(manifest, null, 2) + "\n");

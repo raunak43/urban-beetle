@@ -47,9 +47,16 @@ export default function Statement() {
         <h2 className="sr-only">Strategy, creativity and technology</h2>
         <div className="pillars__grid" data-reveal="stagger">
           {pillars.map((p, i) => (
-            <article key={p.word} className="pillar glow-card">
+            <article key={p.word} className="pillar glow-card" data-tilt="">
               <div className="pillar__media">
-                <Image src={p.image} alt={p.alt} width={1320} height={810} sizes="(max-width: 899px) 100vw, 33vw" />
+                <Image
+                  src={p.image}
+                  alt={p.alt}
+                  width={1320}
+                  height={810}
+                  sizes="(max-width: 899px) 100vw, 33vw"
+                  data-zoom=""
+                />
               </div>
               <div className="pillar__head" aria-hidden="true">
                 <span className="pillar__num">{pad2(i + 1)}</span>

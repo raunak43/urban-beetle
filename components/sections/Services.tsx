@@ -2,7 +2,8 @@ import { services } from "@/lib/content";
 import { Eyebrow, Words, pad2 } from "../Text";
 
 // The services as a horizontal row of cards, each linking to its own page. On desktop the row is pinned and
-// slides sideways as you scroll (MotionEffects, data-hscroll); on touch screens it's swiped.
+// slides sideways as you scroll (MotionEffects, data-hscroll), and the cards hang from it and swing
+// (LiveMotion, data-swing); on touch screens it's swiped.
 export default function Services() {
   return (
     <section className="services section" id="services">
@@ -10,7 +11,7 @@ export default function Services() {
         <header className="section-head">
           <Eyebrow index="02">Capabilities</Eyebrow>
           <h2 className="section-title" data-split="">
-            <Words parts={["Everything a brand", "needs to", { em: "move." }]} />
+            <Words parts={["Everything a brand", "needs to", { em: "move.", alive: true }]} />
           </h2>
           <p className="section-lede" data-reveal="">
             Nine disciplines under one roof, so strategy, creative and performance never lose each other in a handoff.
@@ -22,7 +23,7 @@ export default function Services() {
         <ol className="hs__track" data-reveal="stagger">
           {services.map((s, i) => (
             <li key={s.slug} className="hs__item">
-              <a href={`/services/${s.slug}`} className="hs-card glow-card">
+              <a href={`/services/${s.slug}`} className="hs-card glow-card" data-swing="" data-tilt="">
                 <span className="hs-card__top">
                   <span>{pad2(i + 1)}</span>
                   <span className="hs-card__arrow" aria-hidden="true">

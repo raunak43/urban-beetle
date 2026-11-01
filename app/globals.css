@@ -43,7 +43,8 @@ html.is-loading {
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* The page colour comes from <html>, so the home page's aurora (z-index -1) can glow through. */
+  background: transparent;
   color: var(--text);
   font-family: var(--sans);
   font-size: 16px;
@@ -2087,18 +2088,28 @@ html.is-loading .wa-float {
 
 /* ---------- CTA ---------- */
 
+/* Taller than the screen: the stage stays pinned while the beetle behind the headline takes off. */
 .cta {
   position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding-block: 140px;
-  overflow: hidden;
+  height: 240vh;
+  height: 240svh;
   text-align: center;
 }
 
-.cta__particles {
+.cta__stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  height: 100svh;
+  padding-block: 90px 40px;
+  overflow: hidden;
+}
+
+.cta__scene,
+.cta__particles,
+.cta__shade {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -2106,21 +2117,15 @@ html.is-loading .wa-float {
   pointer-events: none;
 }
 
-.cta__beetle {
-  position: absolute;
-  bottom: -4%;
-  left: 50%;
-  width: min(1200px, 140vw);
-  opacity: 0.4;
-  translate: -50% 0;
-  pointer-events: none;
+/* Dimmed and melted into the page at its edges, so it reads as a backdrop for the headline. */
+.cta__scene {
+  opacity: 0.6;
+  -webkit-mask-image: radial-gradient(ellipse 75% 72% at 50% 50%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 72% at 50% 50%, #000 40%, transparent 100%);
 }
 
-.cta__beetle img {
-  width: 100%;
-  mix-blend-mode: lighten;
-  -webkit-mask-image: radial-gradient(ellipse 48% 48% at 50% 62%, #000 40%, transparent 72%);
-  mask-image: radial-gradient(ellipse 48% 48% at 50% 62%, #000 40%, transparent 72%);
+.cta__shade {
+  background: radial-gradient(ellipse 58% 42% at 50% 50%, rgba(7, 7, 7, 0.62), transparent 78%);
 }
 
 .cta__inner {
@@ -2494,6 +2499,146 @@ html.is-loading .wa-float {
   color: var(--gold);
 }
 
+/* ---------- Living motion (components/LiveMotion.tsx) ---------- */
+
+/* Slow gold light drifting behind the whole page, under every section. */
+.aurora {
+  position: fixed;
+  inset: -20vh 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora i {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.aurora i:nth-child(1) {
+  top: -8%;
+  left: -24%;
+  width: 72vmax;
+  background: radial-gradient(circle, rgba(212, 169, 79, 0.085), rgba(212, 169, 79, 0.03) 40%, transparent 66%);
+  animation: aurora-a 31s ease-in-out infinite alternate;
+}
+
+.aurora i:nth-child(2) {
+  top: 30%;
+  right: -30%;
+  width: 64vmax;
+  background: radial-gradient(circle, rgba(140, 106, 36, 0.12), transparent 64%);
+  animation: aurora-b 37s ease-in-out infinite alternate;
+}
+
+.aurora i:nth-child(3) {
+  bottom: -10%;
+  left: 18%;
+  width: 46vmax;
+  background: radial-gradient(circle, rgba(243, 214, 139, 0.05), transparent 62%);
+  animation: aurora-c 23s ease-in-out infinite alternate;
+}
+
+/* The gold beetle that walks along the scroll-progress line. */
+.rider {
+  position: fixed;
+  top: -2px;
+  left: 0;
+  z-index: 101;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(212, 169, 79, 0.75));
+  transition: opacity 0.8s var(--ease);
+}
+
+.rider__mark {
+  display: block;
+  height: 15px;
+}
+
+.is-loading .rider {
+  opacity: 0;
+}
+
+/* Service cards hang from just above their top edge, so they swing like signs as the row slides. */
+.hs-card {
+  transform-origin: 50% -28px;
+}
+
+/* Photos that settle from a close-up (MotionEffects, data-zoom). */
+[data-zoom] {
+  scale: var(--zoom, 1);
+}
+
+/* "move." never stops moving: a little wiggle, a pause, and again. */
+.sw--alive {
+  transform-origin: 20% 80%;
+  animation: alive 4.2s ease-in-out infinite;
+}
+
+/* About: the beetle floats in slowly turning rays of light. */
+.about__rays {
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(212, 169, 79, 0.075) 0deg 3deg, transparent 3deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 16%, #000 38%, transparent 70%);
+  mask-image: radial-gradient(circle, transparent 16%, #000 38%, transparent 70%);
+  pointer-events: none;
+  animation: spin 90s linear infinite;
+}
+
+.about__halo {
+  animation: breathe 7s ease-in-out infinite;
+}
+
+.about__beetle img {
+  animation: hover-float 8s ease-in-out infinite;
+}
+
+/* Process: a spark runs down the lit part of the rail, and the step in focus sends out ripples. */
+.process__comet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: calc(var(--fill, 0) * 100%);
+  opacity: calc(var(--fill, 0) * 8);
+  translate: -1px 0;
+}
+
+.process__comet::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 56px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, transparent, var(--gold-light));
+  box-shadow: 0 8px 14px rgba(243, 214, 139, 0.5);
+  animation: comet 3.4s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+}
+
+.step__dot::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.step.is-active .step__dot::after {
+  animation: ripple 2.6s var(--ease) infinite;
+}
+
+/* Footer: the closing wordmark floats like it's on water. */
+.footer__word .sw {
+  animation: wave 5.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.34s);
+}
+
 /* ==========================================================================
    Responsive
    ========================================================================== */
@@ -2840,6 +2985,52 @@ html.is-loading .wa-float {
   to { transform: scaleX(1); }
 }
 
+@keyframes aurora-a {
+  to { transform: translate(38vw, 24vh) scale(1.15); }
+}
+
+@keyframes aurora-b {
+  to { transform: translate(-42vw, -18vh) scale(0.85); }
+}
+
+@keyframes aurora-c {
+  to { transform: translate(-20vw, -38vh) scale(1.25); }
+}
+
+@keyframes alive {
+  0%, 60%, 100% { rotate: 0deg; }
+  12% { rotate: -6deg; }
+  26% { rotate: 4deg; }
+  40% { rotate: -2deg; }
+  52% { rotate: 1deg; }
+}
+
+@keyframes breathe {
+  0%, 100% { scale: 0.96; opacity: 0.8; }
+  50% { scale: 1.04; opacity: 1; }
+}
+
+@keyframes hover-float {
+  0%, 100% { transform: translateY(-1.6%) rotate(-1deg); }
+  50% { transform: translateY(1.6%) rotate(0.8deg); }
+}
+
+@keyframes comet {
+  0% { top: -56px; opacity: 0; }
+  20%, 82% { opacity: 1; }
+  100% { top: calc(100% - 56px); opacity: 0; }
+}
+
+@keyframes ripple {
+  from { transform: scale(1); opacity: 0.8; }
+  to { transform: scale(3.4); opacity: 0; }
+}
+
+@keyframes wave {
+  0%, 100% { translate: 0 -0.035em; }
+  50% { translate: 0 0.035em; }
+}
+
 /* Visitors who ask their device for more contrast get the Process steps at full strength, without the
    dim-and-blur focus effect. */
 @media (prefers-contrast: more) {
@@ -2863,5 +3054,9 @@ html.is-loading .wa-float {
     opacity: 1;
     filter: none;
     transform: none;
+  }
+
+  .rider {
+    display: none;
   }
 }

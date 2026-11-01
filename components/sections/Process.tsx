@@ -8,10 +8,12 @@ import { Eyebrow, Words, pad2 } from "../Text";
 export default function Process() {
   const listRef = useRef<HTMLOListElement>(null);
   const lineRef = useRef<HTMLSpanElement>(null);
+  const railRef = useRef<HTMLSpanElement>(null);
   const bigRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const list = listRef.current!;
+    const rail = railRef.current!;
     const steps = gsap.utils.toArray<HTMLElement>(".step", list);
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -20,7 +22,17 @@ export default function Process() {
         {
           scaleY: 1,
           ease: "none",
-          scrollTrigger: { trigger: list, start: "top center", end: "bottom center", scrub: true },
+          scrollTrigger: {
+            trigger: list,
+            start: "top center",
+            end: "bottom center",
+            scrub: true,
+            // Measured after the pinned Capabilities row above, whose pin is created later and adds
+            // its scroll length to everything below it.
+            refreshPriority: -1,
+            // The spark that runs down the rail stays within the lit part.
+            onUpdate: (self) => rail.style.setProperty("--fill", self.progress.toFixed(4)),
+          },
         },
       );
     });
@@ -63,8 +75,9 @@ export default function Process() {
           </div>
         </div>
         <div className="process__steps">
-          <span className="process__rail" aria-hidden="true">
+          <span ref={railRef} className="process__rail" aria-hidden="true">
             <span ref={lineRef} />
+            <span className="process__comet" />
           </span>
           <ol ref={listRef} className="process__list">
             {process.map((p, i) => (

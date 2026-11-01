@@ -7,7 +7,8 @@ export default function About() {
     <section className="about section" id="about">
       <div className="container about__grid">
         <div className="about__visual">
-          <div className="about__halo" aria-hidden="true" />
+          <div className="about__rays" aria-hidden="true" />
+          <div className="about__halo" aria-hidden="true" data-lean="-10" />
           <div className="about__beetle" data-parallax="0.12">
             <Image
               src="/images/beetle-profile.webp"
@@ -15,6 +16,7 @@ export default function About() {
               width={1400}
               height={788}
               sizes="(max-width: 900px) 100vw, 50vw"
+              data-lean="18"
             />
           </div>
           <p className="about__caption">

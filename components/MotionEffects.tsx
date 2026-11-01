@@ -5,6 +5,8 @@ import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion, scrollToTar
 
 // Wires up the declarative animation attributes used throughout the page:
 //   data-reveal / data-reveal="stagger"   fade + rise when scrolled into view
+//   data-reveal="flip"                    children turn up into place one after another
+//   data-zoom                             a photo settles from a close-up as it scrolls in
 //   data-split                            word-by-word masked reveal (words from <Words>)
 //   data-scrub-words                      words brighten as the reader scrolls through
 //   data-parallax="0.15"                  drifts against the scroll
@@ -82,6 +84,21 @@ export default function MotionEffects() {
       if (reduced) return;
 
       all("[data-reveal]").forEach((el) => {
+        if (el.dataset.reveal === "flip") {
+          // Cards swing up from flat, like tiles being turned over one after another.
+          gsap.from(el.children, {
+            rotationX: -80,
+            y: 90,
+            autoAlpha: 0,
+            transformPerspective: 1100,
+            transformOrigin: "50% 100%",
+            duration: 1.6,
+            stagger: 0.1,
+            ease: "expo.out",
+            scrollTrigger: { trigger: el, start: "top 85%", once: true },
+          });
+          return;
+        }
         const targets = el.dataset.reveal === "stagger" ? Array.from(el.children) : el;
         gsap.from(targets, {
           y: 70,
@@ -113,6 +130,20 @@ export default function MotionEffects() {
             stagger: 0.1,
             ease: "none",
             scrollTrigger: { trigger: el, start: "top 82%", end: "bottom 50%", scrub: true },
+          },
+        );
+      });
+
+      // Photos that settle from a close-up as they scroll into view (desktop only, like parallax below).
+      // Driven through --zoom (the CSS `scale`), which leaves `transform` free for the hover zoom.
+      if (!isTouch()) all("[data-zoom]").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { "--zoom": 1.28 },
+          {
+            "--zoom": 1,
+            ease: "none",
+            scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom 35%", scrub: true },
           },
         );
       });
