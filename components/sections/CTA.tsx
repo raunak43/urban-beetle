@@ -6,7 +6,7 @@ import { Words } from "../Text";
 // beetle behind the headline takes off (TakeoffScene), so the page ends where the hero began.
 export default function CTA() {
   return (
-    <section className="cta" id="start" aria-label="Start a project">
+    <section className="cta sheet" id="start" data-surface="ink" aria-label="Start a project">
       <div className="cta__stage">
         <TakeoffScene className="cta__scene" />
         <Particles className="cta__particles" density={0.5} />

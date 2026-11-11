@@ -18,8 +18,8 @@ import { gsap, isTouch, prefersReducedMotion, spring } from "@/lib/motion";
 const ELASTIC = [
   ".section-title .sw",
   ".cta__title .sw",
-  ".pillar__word, .pillar__line, .pillar__body",
-  ".why__card > *",
+  ".stack__word, .stack__line, .stack__body",
+  ".bento__cell > *",
   ".traits li",
   ".faq__item",
 ].join(",");
@@ -27,9 +27,9 @@ const ELASTIC = [
 // How far an element trails the scroll. Later words and lines trail more, and so do cards further to
 // the right, so a headline ripples like a ribbon and a row of cards like a wave.
 function weightOf(el: HTMLElement) {
-  const group = el.closest(".section-title, .cta__title, .pillar, .why__card, .traits, .faq__list");
+  const group = el.closest(".section-title, .cta__title, .stack__card, .bento__cell, .traits, .faq__list");
   const i = group ? Array.from(group.querySelectorAll(ELASTIC)).indexOf(el) : 0;
-  const card = el.closest(".pillar, .why__card");
+  const card = el.closest(".bento__cell");
   const column = card?.parentElement ? Array.from(card.parentElement.children).indexOf(card) % 3 : 0;
   return Math.min(2, 0.6 + 0.14 * i + 0.3 * column);
 }

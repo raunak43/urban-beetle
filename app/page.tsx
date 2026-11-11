@@ -20,6 +20,7 @@ import Why from "@/components/sections/Why";
 import { testimonials } from "@/lib/content";
 
 const pillarsTicker = ["Strategy", "Creativity", "Technology", "We make brands move"];
+const servicesTicker = ["Branding", "Websites", "Social media", "Reels", "Paid ads", "Photography", "SEO", "Influencers"];
 
 // Section numbers in the eyebrows run on from 05 (Process); Client Voices only appears once there are real
 // testimonials, so the sections after it count on from whatever is shown.
@@ -48,7 +49,11 @@ export default function Home() {
       <main id="main">
         <HeroSequence />
         <Statement />
-        <Marquee items={pillarsTicker} />
+        {/* Two bands of type crossing like tape, the second naming what the studio does. */}
+        <div className="bands" data-surface="paper">
+          <Marquee items={pillarsTicker} className="marquee--gold" />
+          <Marquee items={servicesTicker} reverse className="marquee--ink" />
+        </div>
         <Services />
         <Why />
         <About />

@@ -7,6 +7,7 @@ import { gsap, ScrollTrigger, isTouch, loader, prefersReducedMotion, scrollToTar
 //   data-reveal / data-reveal="stagger"   fade + rise when scrolled into view
 //   data-reveal="flip"                    children turn up into place one after another
 //   data-zoom                             a photo settles from a close-up as it scrolls in
+//   data-stack                            sticky cards that sink back as the next one covers them
 //   data-split                            word-by-word masked reveal (words from <Words>)
 //   data-scrub-words                      words brighten as the reader scrolls through
 //   data-parallax="0.15"                  drifts against the scroll
@@ -146,6 +147,19 @@ export default function MotionEffects() {
             scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom 35%", scrub: true },
           },
         );
+      });
+
+      // Stacked cards: each one sinks back a little as the next slides over it. Desktop only, for the
+      // same reason as parallax below; on touch screens the cards still pile up, without the sinking.
+      if (!isTouch()) all("[data-stack]").forEach((stack) => {
+        const cards = Array.from(stack.children) as HTMLElement[];
+        cards.slice(0, -1).forEach((card, i) => {
+          gsap.to(card, {
+            scale: 0.93,
+            ease: "none",
+            scrollTrigger: { trigger: cards[i + 1], start: "top bottom", end: "top 20%", scrub: true },
+          });
+        });
       });
 
       // Parallax is desktop-only: on touch screens the browser scrolls on its own thread, so

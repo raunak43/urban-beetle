@@ -4,7 +4,7 @@ import { Eyebrow, Words } from "../Text";
 
 export default function About() {
   return (
-    <section className="about section" id="about">
+    <section className="about section sheet" id="about" data-surface="ink">
       <div className="container about__grid">
         <div className="about__visual">
           <div className="about__rays" aria-hidden="true" />

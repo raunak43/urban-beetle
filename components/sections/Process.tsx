@@ -60,7 +60,7 @@ export default function Process() {
   }, []);
 
   return (
-    <section className="process section" id="process">
+    <section className="process section sheet" id="process" data-surface="scarab">
       <div className="container process__grid">
         <div className="process__aside">
           <div className="process__sticky">

@@ -46,6 +46,9 @@ export default function Cursor() {
       ring.classList.toggle("is-hover", !!hit);
       ring.classList.toggle("is-label", !!text);
       if (label.textContent !== text) label.textContent = text;
+      // Gold disappears on the paper and gold surfaces, so the cursor turns to ink over them.
+      const surface = target.closest<HTMLElement>("[data-surface]")?.dataset.surface;
+      root.classList.toggle("cursor-on-light", surface === "paper" || surface === "gold");
 
       const mag = magnetic ? target.closest<HTMLElement>("[data-magnetic]") : null;
       if (mag !== pulled) release();
@@ -73,7 +76,7 @@ export default function Cursor() {
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
     return () => {
-      root.classList.remove("has-cursor", "cursor-visible");
+      root.classList.remove("has-cursor", "cursor-visible", "cursor-on-light");
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("pointerdown", onDown);

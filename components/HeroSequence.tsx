@@ -20,6 +20,9 @@ const FAILSAFE_MS = 12000;
 // the whole video, so phones' half-length sequence rocks over the same stretch of time).
 const ROCK = 0.014;
 const IDLE_AFTER_MS = 260;
+// The gold word at the end of "We make brands ...", and how long each one stays.
+const SWAP_WORDS = ["move.", "grow.", "sell.", "shine.", "matter."];
+const SWAP_EVERY_MS = 2600;
 
 const CHAPTERS: [number, string][] = [
   [0, "Intro"],
@@ -221,21 +224,37 @@ export default function HeroSequence() {
     const gctx = gsap.context(() => {
       const q = gsap.utils.selector(section);
 
-      // Time-based entrance once the preloader lifts: the logo rises out of a mask, then the wordmark follows.
+      // Time-based entrance once the preloader lifts: the headline's letters rise out of their masks, the
+      // gold word follows, and the stamp spins in.
+      const swapWords = q(".hero-swap__word");
+      gsap.set(swapWords.slice(1), { yPercent: 130 });
       const intro = gsap
         .timeline({ paused: true, defaults: { ease: "expo.out" } })
-        .fromTo(
-          q(".hero-intro__mark"),
-          { clipPath: "inset(100% 0% 0% 0%)" },
-          { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "expo.inOut" },
-          0,
-        )
-        .from(q(".hero-intro__logo"), { scale: 0.82, yPercent: 8, duration: 2.2 }, 0)
-        .from(q(".hero-intro__word .ch"), { yPercent: 115, duration: 1.4, stagger: 0.045 }, 0.35)
-        .from(q(".hero-intro__sub > *"), { y: 24, opacity: 0, duration: 1.2, stagger: 0.1 }, 0.9)
+        .from(q(".hero-title .ch"), { yPercent: 115, duration: 1.4, stagger: 0.04 }, 0.1)
+        .from(swapWords[0], { yPercent: 130, duration: 1.5 }, 0.6)
+        .from(q(".hero-intro__kicker, .hero-intro__foot > *"), { y: 24, opacity: 0, duration: 1.2, stagger: 0.1 }, 0.8)
+        .from(q(".hero-badge__inner"), { scale: 0, rotate: -120, opacity: 0, duration: 1.8 }, 0.7)
         // Inner children only: the containers themselves are driven by the scroll timeline below.
         .from(q(".hero-intro__scroll > *, .hero-hud > *"), { opacity: 0, duration: 1.2 }, 1.2);
-      const offIntro = loader.onIntro(() => (reduced ? intro.progress(1) : intro.play()));
+
+      // The gold word keeps changing for as long as the headline is on screen.
+      let shown = 0;
+      let swapTimer = 0;
+      const swap = () => {
+        if (window.scrollY > window.innerHeight * 0.4 || document.hidden) return;
+        const leaving = swapWords[shown];
+        shown = (shown + 1) % swapWords.length;
+        gsap.to(leaving, { yPercent: -130, duration: 1, ease: "expo.inOut" });
+        gsap.fromTo(swapWords[shown], { yPercent: 130 }, { yPercent: 0, duration: 1, ease: "expo.inOut" });
+      };
+      const offIntro = loader.onIntro(() => {
+        if (reduced) {
+          intro.progress(1);
+          return;
+        }
+        intro.play();
+        swapTimer = window.setInterval(swap, SWAP_EVERY_MS);
+      });
 
       // Hidden states for the scroll-driven overlays.
       gsap.set(q(".hero-chapter"), { autoAlpha: 0, y: 50 });
@@ -265,8 +284,9 @@ export default function HeroSequence() {
 
       tl.to(view, { frame: count - 1, duration: FRAME_END, onUpdate: () => draw() }, 0)
         .to(view, { zoom: 1.07, duration: 1, onUpdate: () => draw() }, 0)
-        // Intro lockup drifts away as the particles begin to gather.
+        // The headline and its stamp drift away as the particles begin to gather.
         .to(q(".hero-intro__inner"), { yPercent: -18, autoAlpha: 0, scale: 0.94, duration: 0.07 }, 0.005)
+        .to(q(".hero-badge"), { autoAlpha: 0, scale: 0.6, duration: 0.06 }, 0.005)
         .to(q(".hero-intro__scroll"), { autoAlpha: 0, duration: 0.03 }, 0)
         // 01 Origin: beetle assembles.
         .to(q(".hero-chapter--origin"), { autoAlpha: 1, y: 0, duration: 0.04, ease: "power2.out" }, 0.13)
@@ -283,7 +303,10 @@ export default function HeroSequence() {
         .to(q(".hero-outro > *"), { autoAlpha: 1, y: 0, duration: 0.06, stagger: 0.02, ease: "power2.out" }, 0.8)
         .to(q(".hero__shade"), { opacity: 1, duration: 0.08 }, 0.92);
 
-      return () => offIntro();
+      return () => {
+        offIntro();
+        window.clearInterval(swapTimer);
+      };
     }, section);
 
     return () => {
@@ -312,19 +335,54 @@ export default function HeroSequence() {
 
         <div className="hero-intro">
           <div className="hero-intro__inner">
-            <span className="hero-intro__logo">
-              <BeetleMark className="hero-intro__mark" />
-            </span>
-            <h1 className="hero-intro__word">
-              <span className="sr-only">Urban Beetle, a creative marketing agency</span>
-              <Chars text="URBAN" />
-              <Chars text="BEETLE" />
-            </h1>
-            <p className="hero-intro__sub">
-              <span>Creative Marketing Agency</span>
-              <span className="hero-intro__rule" aria-hidden="true" />
-              <span>Strategy · Creativity · Technology</span>
+            <p className="hero-intro__kicker">
+              <span>Urban Beetle</span> Creative marketing agency · Kalyan, India
             </p>
+            <h1 className="hero-title">
+              <span className="sr-only">Urban Beetle, a creative marketing agency. We make brands move.</span>
+              <span className="hero-title__row" aria-hidden="true">
+                <Chars text="We" />
+                <Chars text="make" />
+              </span>
+              <span className="hero-title__row" aria-hidden="true">
+                <Chars text="brands" />
+                <span className="hero-swap">
+                  {SWAP_WORDS.map((word) => (
+                    <span key={word} className="hero-swap__word">
+                      {word}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            </h1>
+            <div className="hero-intro__foot">
+              <p className="hero-intro__lede">
+                Strategy, creativity and technology for businesses that refuse to stand still.
+              </p>
+              <div className="hero-intro__ctas">
+                <a href="/enquiry" className="btn btn--gold" data-magnetic="0.25">
+                  Start a project
+                </a>
+                <a href="#services" className="link-arrow">
+                  See what we do <span aria-hidden="true">↓</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="hero-badge" aria-hidden="true">
+            <div className="hero-badge__inner">
+              <svg viewBox="0 0 200 200" className="hero-badge__ring" data-spin="">
+                <defs>
+                  <path id="hero-badge-circle" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0" />
+                </defs>
+                <text>
+                  <textPath href="#hero-badge-circle" textLength="494" lengthAdjust="spacing">
+                    Strategy · Creativity · Technology · Strategy · Creativity · Technology ·
+                  </textPath>
+                </text>
+              </svg>
+              <BeetleMark className="hero-badge__mark" />
+            </div>
           </div>
           <div className="hero-intro__scroll" aria-hidden="true">
             <span>Scroll to begin</span>
@@ -360,13 +418,13 @@ export default function HeroSequence() {
 
         <p className="hero-statement">
           <span className="hs-line hs-line--1">
-            <span className="hs-word">We</span> <span className="hs-word">make</span>
+            <span className="hs-word">Seen</span> <span className="hs-word">on</span>
           </span>
           <span className="hs-line hs-line--2">
-            <span className="hs-word gold-text">brands</span>
+            <span className="hs-word gold-text">every</span>
           </span>
           <span className="hs-line hs-line--3">
-            <span className="hs-word">move.</span>
+            <span className="hs-word">screen.</span>
           </span>
         </p>
 

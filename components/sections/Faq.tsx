@@ -12,7 +12,7 @@ export default function Faq({ index }: { index: string }) {
   };
 
   return (
-    <section className="faq section" id="faq">
+    <section className="faq section sheet" id="faq" data-surface="paper">
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(jsonLd)} />
       <div className="container faq__grid">
         <div className="faq__intro">

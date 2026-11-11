@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Cursor from "@/components/Cursor";
 import { PageFooter, PageHeader, areasLine } from "@/components/PageChrome";
+import { SERVICE_SURFACES, ServiceArt } from "@/components/ServiceArt";
 import { external, services, site, whatsappHref } from "@/lib/content";
 import { breadcrumbJsonLd, jsonLdHtml, openGraphBase } from "@/lib/seo";
 import { servicePages } from "@/lib/service-pages";
@@ -45,8 +46,11 @@ export default function ServicesPage() {
             {services.map((s, i) => (
               <li key={s.slug}>
                 <a href={`/services/${s.slug}`} className="sp-index__item">
-                  <span className="sp-index__num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="sp-index__art" data-surface={SERVICE_SURFACES[i % SERVICE_SURFACES.length]}>
+                    <ServiceArt slug={s.slug} />
+                  </span>
                   <span className="sp-index__body">
+                    <span className="sp-index__num">{String(i + 1).padStart(2, "0")}</span>
                     <span className="sp-index__name">{servicePages[s.slug].title}</span>
                     <span className="sp-index__text">{s.body}</span>
                   </span>
@@ -59,7 +63,7 @@ export default function ServicesPage() {
           </ol>
         </section>
 
-        <section className="sp-cta" aria-labelledby="cta">
+        <section className="sp-cta" data-surface="gold" aria-labelledby="cta">
           <h2 id="cta" className="sp-cta__title">
             Not sure where to <span className="gold-text">start?</span>
           </h2>

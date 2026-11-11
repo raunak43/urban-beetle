@@ -101,6 +101,25 @@
   padding-block: clamp(48px, 8vw, 120px) clamp(64px, 9vw, 130px);
 }
 
+/* A service page opens with its illustration beside the headline, on that service's surface. */
+.sp-hero--art {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+}
+
+.sp-hero__art {
+  aspect-ratio: 320 / 250;
+  padding: clamp(14px, 2vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: clamp(24px, 3vw, 40px);
+}
+
+.sp-hero__art[data-surface="ink"] {
+  --bg: #121211;
+}
+
 .sp-crumbs {
   display: flex;
   flex-wrap: wrap;
@@ -363,9 +382,9 @@
 
 .sp-index__item {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) 40px;
+  grid-template-columns: clamp(120px, 15vw, 200px) minmax(0, 1fr) 40px;
   align-items: center;
-  gap: 20px;
+  gap: clamp(18px, 2.6vw, 40px);
   padding: clamp(22px, 2.6vw, 34px) 0;
   border-bottom: 1px solid var(--line);
   transition: background 0.5s var(--ease);
@@ -373,6 +392,24 @@
 
 .sp-index__item:hover {
   background: linear-gradient(90deg, rgba(212, 169, 79, 0.08), transparent 70%);
+}
+
+/* The service's illustration as a small tile. */
+.sp-index__art {
+  aspect-ratio: 320 / 236;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  transition: rotate 0.7s var(--ease), scale 0.7s var(--ease);
+}
+
+.sp-index__art[data-surface="ink"] {
+  --bg: #121211;
+}
+
+.sp-index__item:hover .sp-index__art {
+  rotate: -3deg;
+  scale: 1.05;
 }
 
 .sp-index__num {
@@ -414,6 +451,14 @@
   padding-block: clamp(80px, 11vw, 160px);
   border-top: 1px solid var(--line);
   text-align: center;
+}
+
+/* On the services pages it closes the page as a block of gold. */
+.sp-cta[data-surface] {
+  margin-bottom: clamp(40px, 6vw, 90px);
+  padding-inline: var(--pad);
+  border: 0;
+  border-radius: var(--sheet);
 }
 
 .sp-cta__title {
@@ -520,6 +565,14 @@
   .sp-split {
     gap: 32px;
   }
+
+  .sp-hero--art {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-hero__art {
+    max-width: 520px;
+  }
 }
 
 @media (max-width: 599px) {
@@ -533,7 +586,11 @@
   }
 
   .sp-index__item {
-    grid-template-columns: 36px minmax(0, 1fr) 24px;
+    grid-template-columns: 96px minmax(0, 1fr) 20px;
     gap: 14px;
+  }
+
+  .sp-index__art {
+    border-radius: 14px;
   }
 }

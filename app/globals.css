@@ -21,6 +21,16 @@
   --serif: var(--font-serif), "Didot", "Bodoni 72", Georgia, serif;
   --mono: var(--font-mono), ui-monospace, "SFMono-Regular", Consolas, monospace;
   --brand: var(--font-brand), "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  /* Surfaces besides the default ink: warm paper, and the deep green of a scarab's shell. */
+  --paper: #f1ebdd;
+  --ink: #0b0b0a;
+  --scarab: #0a2a22;
+  --mint: #45d9a2;
+  /* Corner radius of the sections that slide over the one before them. */
+  --sheet: clamp(26px, 3.4vw, 52px);
+  /* Illustrations (components/ServiceArt.tsx): accent colour, and the colour of the surface behind. */
+  --art-accent: var(--gold);
+  --art-bg: var(--bg);
 }
 
 *,
@@ -135,6 +145,114 @@ h3 {
 .section {
   position: relative;
   padding-block: clamp(100px, 14vw, 200px);
+}
+
+/* ---------- Surfaces ----------
+   The page is built from four surfaces: ink (the default), warm paper, metallic gold and the deep
+   green of a scarab's shell. data-surface on a section or card re-points the colour variables, so
+   everything inside it follows. Each surface sets the full list, so they can be nested. */
+
+[data-surface] {
+  background: var(--bg);
+  color: var(--text);
+  --art-bg: var(--bg);
+  --art-accent: var(--gold);
+}
+
+[data-surface="ink"] {
+  --bg: #070707;
+  --bg-raise: #0c0c0b;
+  --text: #efe9dc;
+  --muted: #958e7f;
+  --line: rgba(232, 214, 170, 0.11);
+  --line-strong: rgba(232, 214, 170, 0.24);
+  --gold: #d4a94f;
+  --gold-light: #f3d68b;
+  --gold-grad: linear-gradient(100deg, #8c6a24 0%, #d4a94f 20%, #f6dc95 40%, #c39537 60%, #f1d38a 80%, #8c6a24 100%);
+}
+
+[data-surface="paper"] {
+  --bg: var(--paper);
+  --bg-raise: #e8e0cd;
+  --text: #0d0d0c;
+  --muted: #5d5646;
+  --line: rgba(13, 13, 12, 0.13);
+  --line-strong: rgba(13, 13, 12, 0.34);
+  /* Gold dark enough to read as text on paper. */
+  --gold: #8f6910;
+  --gold-light: #7a590d;
+  --gold-grad: linear-gradient(100deg, #6f5210 0%, #a67c1e 20%, #c99a36 40%, #8a6515 60%, #b98d2c 80%, #6f5210 100%);
+  --art-accent: #c2922e;
+  color-scheme: light;
+}
+
+[data-surface="gold"] {
+  --bg: #d6ad55;
+  --bg-raise: #c79c43;
+  --text: #0d0d0c;
+  --muted: rgba(13, 13, 12, 0.7);
+  --line: rgba(13, 13, 12, 0.16);
+  --line-strong: rgba(13, 13, 12, 0.42);
+  --gold: #0d0d0c;
+  --gold-light: #0d0d0c;
+  --gold-grad: linear-gradient(#0d0d0c, #0d0d0c);
+  --art-accent: #0d0d0c;
+  background: linear-gradient(135deg, #f0d48c 0%, #d4a94f 38%, #b98a30 72%, #e3c173 100%);
+  color-scheme: light;
+}
+
+[data-surface="scarab"] {
+  --bg: var(--scarab);
+  --bg-raise: #0e3a2f;
+  --text: #e9f3ea;
+  --muted: #8fb3a3;
+  --line: rgba(190, 240, 215, 0.13);
+  --line-strong: rgba(190, 240, 215, 0.3);
+  --gold: #d4a94f;
+  --gold-light: #f3d68b;
+  --gold-grad: linear-gradient(100deg, #8c6a24 0%, #d4a94f 20%, #f6dc95 40%, #c39537 60%, #f1d38a 80%, #8c6a24 100%);
+  --art-accent: var(--mint);
+}
+
+/* On the light surfaces the main button is ink, and turns gold under the pointer. */
+[data-surface="paper"] .btn--gold,
+[data-surface="gold"] .btn--gold {
+  background: var(--ink);
+  color: var(--paper);
+  animation: none;
+}
+
+[data-surface="paper"] .btn--gold::before,
+[data-surface="gold"] .btn--gold::before {
+  background: linear-gradient(100deg, #d4a94f, #f6dc95 50%, #c39537);
+}
+
+[data-surface="paper"] .btn--gold:hover,
+[data-surface="gold"] .btn--gold:hover {
+  color: var(--ink);
+}
+
+/* A section that slides up over the one before it, like a sheet of card with rounded top corners. */
+.sheet {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * var(--sheet));
+  border-radius: var(--sheet) var(--sheet) 0 0;
+}
+
+/* Sheets are opaque, so the dark ones carry their own soft light instead of the page's aurora. */
+.sheet[data-surface="ink"] {
+  background:
+    radial-gradient(60% 34% at 88% 0%, rgba(212, 169, 79, 0.1), transparent 70%),
+    radial-gradient(50% 30% at 0% 100%, rgba(170, 96, 24, 0.08), transparent 70%),
+    var(--bg);
+}
+
+.sheet[data-surface="scarab"] {
+  background:
+    radial-gradient(70% 40% at 100% 0%, rgba(69, 217, 162, 0.13), transparent 70%),
+    radial-gradient(60% 40% at 0% 100%, rgba(212, 169, 79, 0.1), transparent 70%),
+    var(--bg);
 }
 
 /* ---------- Type ---------- */
@@ -482,7 +600,7 @@ html.is-loading .wa-float {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  background: linear-gradient(to bottom, rgba(7, 7, 7, 0.55), rgba(7, 7, 7, 0));
+  /* Blur only, no tint: it passes over light sections as well as dark ones. */
   -webkit-backdrop-filter: blur(var(--focus-blur));
   backdrop-filter: blur(var(--focus-blur));
   -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent);
@@ -674,6 +792,29 @@ html.is-loading .wa-float {
   opacity: 0;
 }
 
+/* Over the paper and gold surfaces the cursor turns to ink (Cursor adds .cursor-on-light). */
+.cursor-on-light .cursor__dot {
+  background: var(--ink);
+}
+
+.cursor-on-light .cursor__ring {
+  border-color: rgba(13, 13, 12, 0.5);
+}
+
+.cursor-on-light .cursor__ring.is-hover {
+  border-color: var(--ink);
+  background: rgba(13, 13, 12, 0.06);
+}
+
+.cursor-on-light .cursor__ring.is-label {
+  border-color: transparent;
+  background: var(--ink);
+}
+
+.cursor-on-light .cursor__label {
+  color: var(--paper);
+}
+
 /* ---------- Navigation ---------- */
 
 .nav {
@@ -697,7 +838,7 @@ html.is-loading .wa-float {
 
 .nav.is-scrolled {
   padding-block: 14px;
-  background: rgba(7, 7, 7, 0.6);
+  background: rgba(7, 7, 7, 0.82);
   border-color: var(--line);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   backdrop-filter: blur(16px) saturate(140%);
@@ -942,89 +1083,164 @@ html.is-loading .wa-float {
   position: absolute;
   inset: 0;
   z-index: 2;
-  display: grid;
-  place-items: center;
-  padding-inline: var(--pad);
-  text-align: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--pad) clamp(100px, 14vh, 148px);
 }
 
 .hero-intro__inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: clamp(16px, 2.4vw, 28px);
+  gap: clamp(16px, 2.2vw, 30px);
+  width: 100%;
+  max-width: 1352px;
+  margin-inline: auto;
+  transform-origin: 0 100%;
 }
 
-/* The glow lives on the wrapper because filters on a masked element get masked away. */
-.hero-intro__logo {
-  display: block;
-  filter: drop-shadow(0 0 28px rgba(212, 169, 79, 0.4));
-}
-
-.hero-intro__mark {
-  display: block;
-  height: clamp(96px, 11vw, 156px);
-}
-
-/* Set like the logo: wide-tracked Montserrat capitals. Tracking also follows the last letter of each
-   word, so the matching left padding keeps the wordmark optically centred. */
-.hero-intro__word {
+.hero-intro__kicker {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.12em 0.42em;
+  gap: 6px 14px;
   margin: 0;
-  padding-left: 0.14em;
-  font-family: var(--brand);
-  font-size: clamp(2.9rem, 6.6vw, 7rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.14em;
-}
-
-.split-chars {
-  display: inline-flex;
-  overflow: hidden;
-  padding-bottom: 0.06em;
-}
-
-.split-chars .ch {
-  display: inline-block;
-  background: var(--gold-metal);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.hero-intro__sub {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 12px 18px;
-  margin: 0;
-  font-family: var(--brand);
+  font-family: var(--mono);
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-.hero-intro__rule {
-  width: 48px;
-  height: 1px;
-  background: var(--gold);
+.hero-intro__kicker span {
+  color: var(--gold);
+}
+
+/* The headline: heavy capitals, then a gold serif word that keeps changing. */
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: clamp(3.7rem, 13.4vw, 14.5rem);
+  font-weight: 700;
+  line-height: 0.84;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+}
+
+.hero-title__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.2em;
+}
+
+/* Letters rise out of a mask. The mask reaches a little past the last letter, which the tight
+   tracking pushes outside its own box. */
+.split-chars {
+  display: inline-flex;
+  overflow: hidden;
+  padding: 0 0.06em 0.06em 0;
+  margin-right: -0.06em;
+}
+
+.split-chars .ch {
+  display: inline-block;
+}
+
+/* The changing word. Every word sits in the same cell, so the box is as wide as the longest one;
+   the padding is room for the serif's ascenders and descenders, which the gold is painted through. */
+.hero-swap {
+  display: inline-grid;
+  overflow: hidden;
+  margin: -0.1em 0 -0.24em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  text-transform: none;
+}
+
+.hero-swap__word {
+  grid-area: 1 / 1;
+  padding: 0.1em 0.1em 0.24em 0;
+  background: var(--gold-grad);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  white-space: nowrap;
+  animation: sheen 9s linear infinite;
+}
+
+.hero-intro__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px 40px;
+}
+
+.hero-intro__lede {
+  max-width: 36ch;
+  margin: 0;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.45;
+  color: rgba(239, 233, 220, 0.82);
+}
+
+.hero-intro__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 30px;
+}
+
+/* A round stamp that never stops turning (and spins up with the scroll, see data-spin). */
+.hero-badge {
+  position: absolute;
+  top: clamp(96px, 17vh, 176px);
+  right: clamp(20px, 7vw, 124px);
+  width: clamp(108px, 11vw, 172px);
+  aspect-ratio: 1;
+}
+
+.hero-badge__inner {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: rgba(7, 7, 7, 0.4);
+}
+
+.hero-badge__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: spin 24s linear infinite;
+}
+
+.hero-badge__ring text {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  fill: var(--gold-light);
+}
+
+.hero-badge__mark {
+  height: 42%;
 }
 
 .hero-intro__scroll {
   position: absolute;
-  bottom: 32px;
+  bottom: 28px;
   left: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.32em;
@@ -1035,7 +1251,7 @@ html.is-loading .wa-float {
 
 .hero-intro__scroll i {
   width: 1px;
-  height: 56px;
+  height: 40px;
   background: linear-gradient(var(--gold), transparent);
   transform-origin: top;
   animation: scroll-line 2.4s var(--ease) infinite;
@@ -1209,27 +1425,45 @@ html.is-loading .wa-float {
 
 /* ---------- Statement + pillars ---------- */
 
+/* A sheet of paper that slides up over the end of the film. */
 .statement {
-  position: relative;
-  z-index: 2;
-  /* Slides over the last part of the pinned hero so the two scenes cross-fade. */
-  margin-top: -45vh;
-  padding: calc(45vh + clamp(40px, 6vw, 100px)) 0 clamp(100px, 12vw, 180px);
-  background: linear-gradient(to bottom, transparent 0, var(--bg) 45vh);
+  padding: clamp(96px, 12vw, 190px) 0 clamp(70px, 8vw, 120px);
 }
 
 .statement__text {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0;
-  font-size: clamp(1.9rem, 4.5vw, 4.6rem);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+  font-size: clamp(2rem, 5vw, 5.2rem);
+  font-weight: 600;
+  line-height: 1.07;
+  letter-spacing: -0.04em;
   text-wrap: pretty;
 }
 
 .statement__text .sw {
   overflow: visible;
+}
+
+/* Small photos set into the sentence like words (see <Words>). They widen under the pointer. */
+.chip {
+  width: 1.7em;
+  height: 0.8em;
+  margin: 0 0.04em;
+  overflow: hidden;
+  border-radius: 999px;
+  vertical-align: -0.05em;
+  background: var(--ink);
+  transition: width 0.8s var(--ease);
+}
+
+.chip:hover {
+  width: 2.7em;
+}
+
+.chip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .statement__foot {
@@ -1247,119 +1481,84 @@ html.is-loading .wa-float {
   margin: 0;
 }
 
-.pillars {
-  margin-top: clamp(100px, 12vw, 180px);
-}
-
-.pillars__grid {
+/* Strategy, creativity, technology: three cards that pile up as you scroll. Each one sticks a little
+   lower than the last, so the edges of the cards underneath stay in view, and each sinks back as
+   the next slides over it (MotionEffects, data-stack). */
+.stack {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-block: 1px solid var(--line);
+  gap: clamp(20px, 2.4vw, 36px);
+  margin-top: clamp(80px, 10vw, 150px);
 }
 
-/* Each pillar is a photo card: the photo (660:405) fills the top and fades into the page, and the
-   copy starts just above its bottom edge. Padding percentages follow the card's width, as the
-   photo's height does. */
-.pillar {
-  --pillar-pad: clamp(22px, 2.8vw, 44px);
+.stack__card {
+  position: sticky;
+  top: calc(88px + var(--i) * 20px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(24px, 4vw, 64px);
+  min-height: min(600px, 70vh);
+  padding: clamp(18px, 2.4vw, 36px);
+  overflow: hidden;
+  border-radius: var(--sheet);
+  box-shadow: 0 -24px 60px -24px rgba(0, 0, 0, 0.3);
+  transform-origin: 50% 0;
+}
+
+.stack__card[data-surface="ink"] {
+  --bg: #111110;
+}
+
+.stack__copy {
   display: flex;
   flex-direction: column;
-  padding: calc(61.36% - clamp(28px, 3.2vw, 52px)) var(--pillar-pad) clamp(36px, 4.4vw, 64px);
-  border-right: 1px solid var(--line);
+  padding: clamp(6px, 1vw, 16px);
 }
 
-.pillar:last-child {
-  border-right: 0;
+.stack__num {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
 }
 
-.pillar__media {
-  position: absolute;
-  z-index: -2;
-  top: 0;
-  left: 0;
-  right: 0;
-  aspect-ratio: 660 / 405;
+.stack__word {
+  margin: auto 0 0;
+  padding-top: 28px;
+  font-size: clamp(3.1rem, 7.6vw, 8rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.stack__line {
+  margin: 18px 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2.2vw, 2.1rem);
+  font-style: italic;
+  line-height: 1.15;
+  color: var(--gold);
+}
+
+.stack__body {
+  max-width: 36ch;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
+}
+
+.stack__media {
+  position: relative;
+  min-height: 240px;
   overflow: hidden;
+  border-radius: calc(var(--sheet) - 10px);
+  background: var(--ink);
 }
 
-/* Eased fade, so the photo melts into the page without a visible edge. */
-.pillar__media::after {
-  content: "";
+.stack__media img {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(7, 7, 7, 0.25),
-    rgba(7, 7, 7, 0) 25%,
-    rgba(7, 7, 7, 0) 40%,
-    rgba(7, 7, 7, 0.16) 55%,
-    rgba(7, 7, 7, 0.5) 70%,
-    rgba(7, 7, 7, 0.84) 85%,
-    rgba(7, 7, 7, 0.97) 94%,
-    var(--bg)
-  );
-}
-
-.pillar__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 1.6s var(--ease);
-}
-
-@media (hover: hover) {
-  .pillar:hover .pillar__media img {
-    transform: scale(1.05);
-  }
-}
-
-.pillar__head {
-  position: absolute;
-  top: clamp(22px, 2.6vw, 40px);
-  left: var(--pillar-pad);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.pillar__num {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--text);
-}
-
-.pillar__icon {
-  height: clamp(28px, 2.4vw, 36px);
-  fill: none;
-  stroke: var(--gold-light);
-  stroke-width: 1.5;
-  opacity: 0.85;
-}
-
-.pillar__icon-fill {
-  fill: var(--gold-light);
-  stroke: none;
-}
-
-.pillar__word {
-  margin: 0 0 18px;
-  font-size: clamp(2.3rem, 4vw, 4.2rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.pillar__line {
-  margin: 0 0 12px;
-  font-family: var(--serif);
-  font-size: clamp(1.15rem, 1.5vw, 1.4rem);
-  font-style: italic;
-  color: var(--gold-light);
-}
-
-.pillar__body {
-  max-width: 34ch;
-  margin: 0;
-  color: var(--muted);
 }
 
 /* ---------- Marquee ---------- */
@@ -1419,6 +1618,54 @@ html.is-loading .wa-float {
   -webkit-text-stroke: 1px rgba(212, 169, 79, 0.45);
 }
 
+/* Two bands of moving type that cross like tape, between the statement and the services. */
+.bands {
+  position: relative;
+  z-index: 2;
+  padding: clamp(50px, 7vw, 120px) 0 clamp(130px, 15vw, 250px);
+  overflow: hidden;
+  overflow: clip;
+}
+
+.bands .marquee {
+  width: 112%;
+  margin-left: -6%;
+  padding: clamp(12px, 1.5vw, 20px) 0;
+  border: 0;
+}
+
+.bands .marquee__item {
+  font-size: clamp(1.9rem, 4.6vw, 4.4rem);
+}
+
+.marquee--gold {
+  z-index: 3;
+  background: linear-gradient(100deg, #f0d48c 0%, #d4a94f 35%, #b98a30 70%, #e3c173 100%);
+  color: var(--ink);
+  rotate: -4deg;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.4);
+}
+
+.marquee--gold .marquee__item:nth-child(even) {
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+}
+
+.marquee--gold .marquee__sep {
+  color: var(--ink);
+}
+
+.marquee--ink {
+  margin-top: clamp(-100px, -7vw, -56px);
+  background: var(--ink);
+  color: var(--paper);
+  rotate: 3.5deg;
+}
+
+.marquee--ink .marquee__sep {
+  color: #d4a94f;
+}
+
 /* ---------- Services: a horizontal row of cards ----------
    Swiped natively by default (touch screens, reduced motion); on desktop MotionEffects pins the row
    and slides it sideways as you scroll, adding .is-pinned. */
@@ -1454,90 +1701,110 @@ html.is-loading .wa-float {
 
 .hs__item {
   flex: none;
-  width: clamp(280px, 27vw, 400px);
+  width: clamp(290px, 28vw, 410px);
   scroll-snap-align: start;
 }
 
-.hs-card {
+/* Each service is a poster on one of the four surfaces: number and arrow, its moving illustration,
+   then the words. */
+.svc-card {
   display: flex;
   flex-direction: column;
-  height: clamp(380px, 56vh, 480px);
-  padding: 30px 28px;
+  height: clamp(470px, 68vh, 590px);
+  padding: 14px 14px 26px;
+  overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(232, 214, 170, 0.045), rgba(255, 255, 255, 0.008));
+  border-radius: 30px;
   outline: none;
-  transition: border-color 0.5s var(--ease);
+  transition: translate 0.7s var(--ease), box-shadow 0.7s var(--ease);
 }
 
-.hs-card::before {
-  border-radius: inherit;
+.svc-card[data-surface="ink"] {
+  --bg: #121211;
 }
 
-.hs-card:hover,
-.hs-card:focus-visible {
-  border-color: rgba(212, 169, 79, 0.45);
+.svc-card[data-surface="gold"],
+.svc-card[data-surface="paper"] {
+  border-color: transparent;
 }
 
-.hs-card:focus-visible {
-  box-shadow: 0 0 0 3px rgba(212, 169, 79, 0.35);
+.svc-card:hover,
+.svc-card:focus-visible {
+  translate: 0 -12px;
+  box-shadow: 0 34px 60px -34px rgba(0, 0, 0, 0.8);
 }
 
-.hs-card__top {
+.svc-card:focus-visible {
+  box-shadow: 0 0 0 3px rgba(212, 169, 79, 0.55);
+}
+
+.svc-card__top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 4px 6px 12px 14px;
   font-family: var(--mono);
   font-size: 12px;
   color: var(--gold);
 }
 
-.hs-card__arrow {
-  font-size: 22px;
-  color: var(--muted);
-  transition: transform 0.6s var(--ease), color 0.4s;
+.svc-card__arrow {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 18px;
+  color: var(--text);
+  transition: transform 0.6s var(--ease), background 0.4s, color 0.4s;
 }
 
-.hs-card:hover .hs-card__arrow,
-.hs-card:focus-visible .hs-card__arrow {
-  color: var(--gold);
+.svc-card:hover .svc-card__arrow,
+.svc-card:focus-visible .svc-card__arrow {
+  background: var(--text);
+  color: var(--bg);
   transform: rotate(45deg);
 }
 
-.hs-card__name {
-  margin: auto 0 14px;
-  font-size: clamp(2rem, 2.9vw, 2.8rem);
+.svc-card__art {
+  flex: 1;
+  min-height: 0;
+  padding: 8px;
+  border-radius: 20px;
+  background: rgba(128, 128, 128, 0.1);
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+.svc-card__name {
+  margin: 22px 14px 10px;
+  font-size: clamp(1.9rem, 2.7vw, 2.6rem);
   line-height: 1;
   letter-spacing: -0.04em;
-  transition: color 0.4s;
 }
 
-.hs-card:hover .hs-card__name {
-  color: var(--gold-light);
-}
-
-.hs-card__body {
-  margin-bottom: 22px;
+.svc-card__body {
+  margin: 0 14px 18px;
   color: var(--muted);
-  font-size: 0.98rem;
-  line-height: 1.55;
+  font-size: 0.96rem;
+  line-height: 1.5;
 }
 
-.hs-card__tags {
+.svc-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  margin: 0 14px;
 }
 
-.hs-card__tags span {
-  padding: 6px 12px;
-  border: 1px solid var(--line);
+.svc-card__tags span {
+  padding: 5px 11px;
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
 }
 
 .hs__foot {
@@ -1591,43 +1858,79 @@ html.is-loading .wa-float {
   display: inline;
 }
 
-/* ---------- Why ---------- */
+/* ---------- Why: a bento grid of reasons ---------- */
 
-.why__grid {
+.bento {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 20px);
 }
 
-.why__card {
+.bento__cell {
   display: flex;
   flex-direction: column;
-  min-height: 310px;
-  padding: clamp(28px, 3vw, 48px);
-  background: var(--bg);
-  transition: background 0.5s;
+  grid-column: span 4;
+  min-height: clamp(280px, 25vw, 350px);
+  padding: clamp(24px, 2.4vw, 36px);
+  overflow: hidden;
+  border-radius: clamp(22px, 2.4vw, 34px);
+  transition: translate 0.7s var(--ease);
 }
 
-.why__card:hover {
-  background: var(--bg-raise);
+.bento__cell:hover {
+  translate: 0 -8px;
 }
 
-.why__num {
+.bento__cell:nth-child(1),
+.bento__cell:nth-child(6) {
+  grid-column: span 5;
+}
+
+.bento__cell:nth-child(3),
+.bento__cell:nth-child(4) {
+  grid-column: span 3;
+}
+
+.bento__cell[data-surface="ink"] {
+  --bg: #111110;
+}
+
+/* The paper cells are a shade deeper than the page, so they read as cards. */
+.bento__cell[data-surface="paper"] {
+  --bg: #e7dfcb;
+}
+
+.bento__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bento__num {
   font-family: var(--mono);
   font-size: 12px;
+  letter-spacing: 0.2em;
   color: var(--gold);
 }
 
-.why__card h3 {
-  margin: auto 0 12px;
-  font-size: clamp(1.45rem, 2vw, 1.95rem);
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+.art.bento__glyph {
+  flex: none;
+  width: clamp(104px, 10.5vw, 160px);
+  height: auto;
+  aspect-ratio: 1;
+  margin: -6px -6px 0 0;
 }
 
-.why__card p {
+.bento__cell h3 {
+  margin: auto 0 10px;
+  padding-top: 28px;
+  font-size: clamp(1.5rem, 2.1vw, 2.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.bento__cell p {
+  max-width: 40ch;
   margin: 0;
   color: var(--muted);
 }
@@ -2499,6 +2802,236 @@ html.is-loading .wa-float {
   color: var(--gold);
 }
 
+/* ---------- Illustrations (components/ServiceArt.tsx) ----------
+   Line drawings that take the colours of the surface they sit on, and never stop moving. Each a-*
+   class is one looping movement; its speed and offset are set inline on the shape. */
+
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.art .ln,
+.art .ac-ln,
+.art .bg-ln {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.art .ln {
+  stroke: currentColor;
+}
+
+.art .ln--soft {
+  opacity: 0.3;
+}
+
+.art .ln--bold {
+  stroke-width: 3.2;
+}
+
+.art .ac-ln {
+  stroke: var(--art-accent);
+  stroke-width: 3;
+}
+
+.art .bg-ln {
+  stroke: var(--art-bg);
+  stroke-width: 2;
+}
+
+.art .fl {
+  fill: currentColor;
+}
+
+.art .ac {
+  fill: var(--art-accent);
+}
+
+.art .bg {
+  fill: var(--art-bg);
+}
+
+.art-txt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  fill: currentColor;
+  opacity: 0.6;
+}
+
+.art-txt--lg {
+  font-family: var(--sans);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0;
+  opacity: 1;
+}
+
+.a-spin,
+.a-pulse,
+.a-ping,
+.a-rise,
+.a-grow-y,
+.a-grow-x,
+.a-wave,
+.a-blink,
+.a-draw,
+.a-bob,
+.a-sway,
+.a-pop,
+.a-iris,
+.a-streak,
+.a-twinkle,
+.a-link,
+.a-orbit,
+.art-click,
+.art-type {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.a-spin {
+  animation-name: a-spin;
+  animation-timing-function: linear;
+}
+
+/* Turns around the middle of the drawing rather than its own centre. */
+.a-orbit {
+  transform-box: view-box;
+  transform-origin: 160px 110px;
+  animation-name: a-spin;
+  animation-timing-function: linear;
+}
+
+.a-orbit--rev {
+  animation-direction: reverse;
+}
+
+.a-orbit--sm {
+  transform-origin: 60px 61px;
+}
+
+.a-pulse {
+  animation-name: a-pulse;
+}
+
+.a-ping {
+  animation-name: a-ping;
+  animation-timing-function: ease-out;
+}
+
+.a-rise {
+  animation-name: a-rise;
+  animation-timing-function: ease-out;
+}
+
+.a-grow-y {
+  transform-origin: 50% 100%;
+  animation-name: a-grow-y;
+}
+
+.a-grow-x {
+  transform-origin: 0 50%;
+  animation-name: a-grow-x;
+}
+
+.a-wave {
+  animation-name: a-wave;
+  animation-direction: alternate;
+}
+
+.a-blink {
+  animation-name: a-blink;
+  animation-timing-function: steps(1);
+}
+
+/* Needs pathLength="1" on the shape, so one dash is the whole line. */
+.a-draw {
+  stroke-dasharray: 1;
+  animation-name: a-draw;
+}
+
+.a-bob {
+  animation-name: a-bob;
+}
+
+.a-sway {
+  animation-name: a-sway;
+}
+
+.a-pop {
+  animation-name: a-pop;
+}
+
+.a-iris {
+  animation-name: a-iris;
+}
+
+.a-streak {
+  animation-name: a-streak;
+  animation-timing-function: linear;
+}
+
+.a-twinkle {
+  animation-name: a-twinkle;
+}
+
+.a-link {
+  animation-name: a-link;
+}
+
+.a-link--rev {
+  animation-name: a-link-rev;
+}
+
+.art-cursor {
+  animation: art-cursor 7s var(--ease) infinite;
+}
+
+.art-click {
+  opacity: 0;
+  animation-name: art-click;
+  animation-duration: 7s;
+  animation-timing-function: ease-out;
+}
+
+.art-playhead {
+  animation: art-playhead 5s linear infinite;
+}
+
+.art-flash {
+  opacity: 0;
+  animation: art-flash 4.5s linear infinite;
+}
+
+.art-type {
+  transform-origin: 0 50%;
+  animation-name: art-type;
+  animation-duration: 6s;
+  animation-timing-function: steps(9);
+}
+
+.art-rank,
+.art-rank-1,
+.art-rank-2 {
+  animation: art-rank 7s var(--ease) infinite;
+}
+
+.art-rank-1 {
+  animation-name: art-rank-1;
+}
+
+.art-rank-2 {
+  animation-name: art-rank-2;
+}
+
 /* ---------- Living motion (components/LiveMotion.tsx) ---------- */
 
 /* Slow gold light drifting behind the whole page, under every section. */
@@ -2562,7 +3095,7 @@ html.is-loading .wa-float {
 }
 
 /* Service cards hang from just above their top edge, so they swing like signs as the row slides. */
-.hs-card {
+.svc-card {
   transform-origin: 50% -28px;
 }
 
@@ -2644,8 +3177,12 @@ html.is-loading .wa-float {
    ========================================================================== */
 
 @media (max-width: 1100px) {
-  .why__grid {
-    grid-template-columns: repeat(2, 1fr);
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bento .bento__cell {
+    grid-column: auto;
   }
 }
 
@@ -2672,22 +3209,23 @@ html.is-loading .wa-float {
     grid-template-columns: 1fr;
   }
 
-  /* One card per row, photos running edge to edge and the copy lined up with the page. */
-  .pillars__grid {
+  /* The stacked cards turn upright: photo on top, words underneath. */
+  .stack__card {
+    top: calc(74px + var(--i) * 12px);
     grid-template-columns: 1fr;
-    margin-inline: calc(-1 * var(--pad));
+    gap: 8px;
+    min-height: 0;
   }
 
-  .pillar {
-    --pillar-pad: var(--pad);
-    padding-top: calc(61.36% - 32px);
-    padding-bottom: 56px;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+  .stack__media {
+    order: -1;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
   }
 
-  .pillar:last-child {
-    border-bottom: 0;
+  .stack__word {
+    margin-top: 0;
+    padding-top: 22px;
   }
 
   .about__grid,
@@ -2729,19 +3267,31 @@ html.is-loading .wa-float {
   }
 
   /* On phones the video sits as a band in the middle; copy lives above and below it. */
-  .hero-intro__sub {
-    flex-direction: column;
-    gap: 10px;
-    font-size: 10.5px;
-    letter-spacing: 0.2em;
+  .hero-intro {
+    padding-bottom: 92px;
   }
 
-  .hero-intro__rule {
-    width: 32px;
+  .hero-title {
+    font-size: clamp(3.3rem, 19.5vw, 6.6rem);
+  }
+
+  .hero-intro__foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-badge {
+    top: 84px;
+    right: 14px;
+    width: 92px;
   }
 
   .hero-intro__scroll {
-    bottom: 24px;
+    bottom: 20px;
+  }
+
+  .hero-intro__scroll i {
+    height: 28px;
   }
 
   .hero-chapter,
@@ -2795,22 +3345,29 @@ html.is-loading .wa-float {
     display: none;
   }
 
-  .statement {
-    margin-top: -35vh;
-    padding-top: calc(35vh + 40px);
-    background: linear-gradient(to bottom, transparent 0, var(--bg) 35vh);
-  }
-
-  .why__grid {
+  .bento {
     grid-template-columns: 1fr;
   }
 
-  .why__card {
+  .bento__cell {
     min-height: 0;
   }
 
-  .why__card h3 {
-    margin-top: 40px;
+  .bento__cell h3 {
+    padding-top: 36px;
+  }
+
+  .hs__item {
+    width: 82vw;
+  }
+
+  .svc-card {
+    height: auto;
+  }
+
+  .svc-card__art {
+    flex: none;
+    aspect-ratio: 320 / 236;
   }
 
   .traits li {
@@ -2843,15 +3400,6 @@ html.is-loading .wa-float {
 
   .footer__bottom {
     flex-direction: column;
-  }
-
-  .hs__item {
-    width: 80vw;
-  }
-
-  .hs-card {
-    height: auto;
-    min-height: 360px;
   }
 
   .wa-float {
@@ -2894,7 +3442,7 @@ html.is-loading .wa-float {
   .cta__button,
   .nav__mark,
   .footer__mark,
-  .hero-intro__mark,
+  .hero-swap__word,
   .preloader__mark-fill {
     animation: none;
   }
@@ -2916,7 +3464,7 @@ html.is-loading .wa-float {
 
   /* The focus bands already blur behind the nav, so it doesn't need its own. */
   .nav.is-scrolled {
-    background: rgba(7, 7, 7, 0.7);
+    background: rgba(7, 7, 7, 0.9);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -3030,6 +3578,112 @@ html.is-loading .wa-float {
   0%, 100% { translate: 0 -0.035em; }
   50% { translate: 0 0.035em; }
 }
+@keyframes a-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes a-pulse {
+  0%, 100% { transform: scale(0.88); }
+  50% { transform: scale(1.12); }
+}
+@keyframes a-ping {
+  0% { transform: scale(0.5); opacity: 0.9; }
+  100% { transform: scale(2); opacity: 0; }
+}
+@keyframes a-rise {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-110px) scale(1.15); opacity: 0; }
+}
+@keyframes a-grow-y {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+@keyframes a-grow-x {
+  0%, 100% { transform: scaleX(0); }
+  22%, 84% { transform: scaleX(1); }
+}
+@keyframes a-wave {
+  from { transform: scaleY(0.3); }
+  to { transform: scaleY(1); }
+}
+@keyframes a-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes a-draw {
+  0% { stroke-dashoffset: 1; }
+  35%, 80% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -1; }
+}
+@keyframes a-bob {
+  0%, 100% { transform: translateY(-5px); }
+  50% { transform: translateY(5px); }
+}
+@keyframes a-sway {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+@keyframes a-pop {
+  0%, 8%, 94%, 100% { transform: scale(0); }
+  18% { transform: scale(1.15); }
+  24%, 86% { transform: scale(1); }
+}
+@keyframes a-iris {
+  0%, 100% { transform: scale(0.55) rotate(0deg); }
+  50% { transform: scale(1.35) rotate(60deg); }
+}
+@keyframes a-streak {
+  0% { transform: translateX(-14px); opacity: 0; }
+  30%, 60% { opacity: 1; }
+  100% { transform: translateX(16px); opacity: 0; }
+}
+@keyframes a-twinkle {
+  0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0.3; }
+  50% { transform: scale(1) rotate(45deg); opacity: 1; }
+}
+@keyframes a-link {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(7px); }
+}
+@keyframes a-link-rev {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-7px); }
+}
+@keyframes art-cursor {
+  0%, 70%, 100% { transform: translate(236px, 176px); }
+  38%, 46% { transform: translate(80px, 128px); }
+  42% { transform: translate(80px, 128px) scale(0.84); }
+}
+@keyframes art-click {
+  0%, 40% { transform: scale(0.5); opacity: 0; }
+  43% { opacity: 0.9; }
+  62%, 100% { transform: scale(2.1); opacity: 0; }
+}
+@keyframes art-playhead {
+  from { transform: translateX(44px); }
+  to { transform: translateX(276px); }
+}
+@keyframes art-flash {
+  0%, 88%, 100% { opacity: 0; }
+  90% { opacity: 0.55; }
+}
+@keyframes art-type {
+  from { transform: scaleX(0); }
+  60%, to { transform: scaleX(1); }
+}
+@keyframes art-rank {
+  0%, 14%, 100% { transform: translateY(0); }
+  30%, 44% { transform: translateY(-42px); }
+  60%, 90% { transform: translateY(-84px); }
+}
+@keyframes art-rank-1 {
+  0%, 44%, 100% { transform: translateY(0); }
+  60%, 90% { transform: translateY(42px); }
+}
+@keyframes art-rank-2 {
+  0%, 14%, 100% { transform: translateY(0); }
+  30%, 90% { transform: translateY(42px); }
+}
 
 /* Visitors who ask their device for more contrast get the Process steps at full strength, without the
    dim-and-blur focus effect. */
@@ -3058,5 +3712,10 @@ html.is-loading .wa-float {
 
   .rider {
     display: none;
+  }
+
+  /* Illustrations rest on their drawn state. */
+  .art * {
+    animation: none !important;
   }
 }

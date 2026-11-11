@@ -23,7 +23,8 @@ export default function Testimonials({ index }: { index: string }) {
 
   return (
     <section
-      className="voices section"
+      className="voices section sheet"
+      data-surface="ink"
       id="testimonials"
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}

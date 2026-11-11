@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Cursor from "@/components/Cursor";
 import { PageFooter, PageHeader, areasLine } from "@/components/PageChrome";
+import { SERVICE_SURFACES, ServiceArt } from "@/components/ServiceArt";
 import { external, process, services, site, whatsappHref } from "@/lib/content";
 import { jsonLdHtml, openGraphBase, servicePageJsonLd } from "@/lib/seo";
 import { servicePages } from "@/lib/service-pages";
@@ -57,31 +58,36 @@ export default async function ServicePage({ params }: Props) {
       <PageHeader />
 
       <main className="sp">
-        <section className="sp-hero">
-          <nav className="sp-crumbs" aria-label="Breadcrumb">
-            <a href="/">Home</a>
-            <span aria-hidden="true">/</span>
-            <a href="/services">Services</a>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page">{service.name}</span>
-          </nav>
-          <h1 className="sp-title">
-            {page.heading} <span className="gold-text">{site.address.locality}</span>
-          </h1>
-          <p className="sp-lede">{page.intro}</p>
-          <div className="sp-ctas">
-            <a href="/enquiry" className="btn btn--gold">
-              Start a project
-            </a>
-            <a href={whatsappHref} {...external} className="btn">
-              Chat on WhatsApp
-            </a>
+        <section className="sp-hero sp-hero--art">
+          <div className="sp-hero__copy">
+            <nav className="sp-crumbs" aria-label="Breadcrumb">
+              <a href="/">Home</a>
+              <span aria-hidden="true">/</span>
+              <a href="/services">Services</a>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{service.name}</span>
+            </nav>
+            <h1 className="sp-title">
+              {page.heading} <span className="gold-text">{site.address.locality}</span>
+            </h1>
+            <p className="sp-lede">{page.intro}</p>
+            <div className="sp-ctas">
+              <a href="/enquiry" className="btn btn--gold">
+                Start a project
+              </a>
+              <a href={whatsappHref} {...external} className="btn">
+                Chat on WhatsApp
+              </a>
+            </div>
+            <ul className="tags sp-tags">
+              {service.tags.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
           </div>
-          <ul className="tags sp-tags">
-            {service.tags.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
+          <div className="sp-hero__art" data-surface={SERVICE_SURFACES[services.indexOf(service) % SERVICE_SURFACES.length]}>
+            <ServiceArt slug={service.slug} />
+          </div>
         </section>
 
         <section className="sp-section" aria-labelledby="included">
@@ -162,7 +168,7 @@ export default async function ServicePage({ params }: Props) {
           </ul>
         </section>
 
-        <section className="sp-cta" aria-labelledby="cta">
+        <section className="sp-cta" data-surface="gold" aria-labelledby="cta">
           <h2 id="cta" className="sp-cta__title">
             Let&apos;s make your brand <span className="gold-text">move.</span>
           </h2>

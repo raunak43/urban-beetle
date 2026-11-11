@@ -1,28 +1,16 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { pillars } from "@/lib/content";
 import { Eyebrow, Words, pad2 } from "../Text";
 
-// A line running into a gold ring, with a spark inside for Technology.
-function PillarIcon({ spark }: { spark: boolean }) {
-  return (
-    <svg className="pillar__icon" viewBox="0 0 78 52" aria-hidden="true">
-      <path d={spark ? "M0 26H28" : "M0 26H78"} />
-      <circle cx="52" cy="26" r="24" />
-      {spark ? (
-        <>
-          <path d="M52 11v8M52 33v8M37 26h8M59 26h8M44.2 18.2l2.8 2.8M57 31l2.8 2.8M59.8 18.2L57 21M47 31l-2.8 2.8" />
-          <circle className="pillar__icon-fill" cx="52" cy="26" r="4.5" />
-        </>
-      ) : (
-        <circle className="pillar__icon-fill" cx="52" cy="26" r="2" />
-      )}
-    </svg>
-  );
-}
+// One surface per pillar card, in order.
+const SURFACES = ["ink", "gold", "scarab"] as const;
 
 export default function Statement() {
+  const [strategy, creativity, technology] = pillars;
+
   return (
-    <section className="statement" id="statement" aria-label="Brand statement">
+    <section className="statement sheet" id="statement" data-surface="paper" aria-label="Brand statement">
       <div className="container">
         <Eyebrow index="01">The Statement</Eyebrow>
         <p className="statement__text" data-scrub-words="">
@@ -30,7 +18,13 @@ export default function Statement() {
             parts={[
               "Urban Beetle is a creative marketing agency for brands that",
               { em: "refuse to stand still." },
-              "We fuse strategy, creativity and technology to turn ordinary businesses into brands people",
+              "We fuse",
+              { chip: strategy.image },
+              "strategy,",
+              { chip: creativity.image },
+              "creativity and",
+              { chip: technology.image },
+              "technology to turn ordinary businesses into brands people",
               { em: "remember." },
             ]}
           />
@@ -43,28 +37,28 @@ export default function Statement() {
         </div>
       </div>
 
-      <div className="pillars container">
+      {/* Strategy, creativity and technology as cards that pile up while you scroll. */}
+      <div className="container">
         <h2 className="sr-only">Strategy, creativity and technology</h2>
-        <div className="pillars__grid" data-reveal="stagger">
+        <div className="stack" data-stack="">
           {pillars.map((p, i) => (
-            <article key={p.word} className="pillar glow-card" data-tilt="">
-              <div className="pillar__media">
-                <Image
-                  src={p.image}
-                  alt={p.alt}
-                  width={1320}
-                  height={810}
-                  sizes="(max-width: 899px) 100vw, 33vw"
-                  data-zoom=""
-                />
+            <article
+              key={p.word}
+              className="stack__card"
+              data-surface={SURFACES[i % SURFACES.length]}
+              style={{ "--i": i } as CSSProperties}
+            >
+              <div className="stack__copy">
+                <span className="stack__num" aria-hidden="true">
+                  {pad2(i + 1)} / {pad2(pillars.length)}
+                </span>
+                <h3 className="stack__word">{p.word}</h3>
+                <p className="stack__line">{p.line}</p>
+                <p className="stack__body">{p.body}</p>
               </div>
-              <div className="pillar__head" aria-hidden="true">
-                <span className="pillar__num">{pad2(i + 1)}</span>
-                <PillarIcon spark={p.icon === "spark"} />
+              <div className="stack__media">
+                <Image src={p.image} alt={p.alt} width={1320} height={810} sizes="(max-width: 899px) 100vw, 55vw" />
               </div>
-              <h3 className="pillar__word">{p.word}</h3>
-              <p className="pillar__line">{p.line}</p>
-              <p className="pillar__body">{p.body}</p>
             </article>
           ))}
         </div>

@@ -1,12 +1,13 @@
 import { services } from "@/lib/content";
+import { SERVICE_SURFACES, ServiceArt } from "../ServiceArt";
 import { Eyebrow, Words, pad2 } from "../Text";
 
-// The services as a horizontal row of cards, each linking to its own page. On desktop the row is pinned and
-// slides sideways as you scroll (MotionEffects, data-hscroll), and the cards hang from it and swing
+// The services as a horizontal row of posters, each linking to its own page. On desktop the row is pinned
+// and slides sideways as you scroll (MotionEffects, data-hscroll), and the cards hang from it and swing
 // (LiveMotion, data-swing); on touch screens it's swiped.
 export default function Services() {
   return (
-    <section className="services section" id="services">
+    <section className="services section sheet" id="services" data-surface="ink">
       <div className="container">
         <header className="section-head">
           <Eyebrow index="02">Capabilities</Eyebrow>
@@ -23,16 +24,26 @@ export default function Services() {
         <ol className="hs__track" data-reveal="stagger">
           {services.map((s, i) => (
             <li key={s.slug} className="hs__item">
-              <a href={`/services/${s.slug}`} className="hs-card glow-card" data-swing="" data-tilt="">
-                <span className="hs-card__top">
+              <a
+                href={`/services/${s.slug}`}
+                className="svc-card"
+                data-surface={SERVICE_SURFACES[i % SERVICE_SURFACES.length]}
+                data-swing=""
+                data-tilt=""
+                data-cursor-label="View"
+              >
+                <span className="svc-card__top">
                   <span>{pad2(i + 1)}</span>
-                  <span className="hs-card__arrow" aria-hidden="true">
+                  <span className="svc-card__arrow" aria-hidden="true">
                     ↗
                   </span>
                 </span>
-                <h3 className="hs-card__name">{s.name}</h3>
-                <span className="hs-card__body">{s.body}</span>
-                <span className="hs-card__tags">
+                <span className="svc-card__art">
+                  <ServiceArt slug={s.slug} />
+                </span>
+                <h3 className="svc-card__name">{s.name}</h3>
+                <span className="svc-card__body">{s.body}</span>
+                <span className="svc-card__tags">
                   {s.tags.map((t) => (
                     <span key={t}>{t}</span>
                   ))}
