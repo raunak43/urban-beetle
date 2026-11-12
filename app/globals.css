@@ -1041,8 +1041,8 @@ html.is-loading .wa-float {
 
 .hero {
   position: relative;
-  height: 560vh;
-  height: 560svh;
+  height: 480vh;
+  height: 480svh;
 }
 
 .hero__stage {
@@ -1054,7 +1054,7 @@ html.is-loading .wa-float {
 }
 
 .hero__canvas,
-.hero__particles,
+.hero__backdrop,
 .hero__vignette,
 .hero__shade {
   position: absolute;
@@ -1064,9 +1064,19 @@ html.is-loading .wa-float {
   pointer-events: none;
 }
 
-.hero__particles {
-  mix-blend-mode: screen;
-  opacity: 0.85;
+/* A photo of gold dust (made with Google Flow) far behind the live dust, drifting very slowly. Its
+   middle is dark, which is where the dust forms its shapes. */
+.hero__backdrop {
+  overflow: hidden;
+  opacity: 0.26;
+  /* Only the edges show, so nothing sits behind the words. */
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, transparent 30%, #000 100%);
+  mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, transparent 30%, #000 100%);
+}
+
+.hero__backdrop img {
+  object-fit: cover;
+  animation: backdrop-drift 40s ease-in-out infinite alternate;
 }
 
 .hero__vignette {
@@ -1265,10 +1275,27 @@ html.is-loading .wa-float {
   max-width: 560px;
 }
 
-.hero-chapter--flight {
-  left: auto;
-  right: calc(var(--pad) + 40px);
-  text-align: right;
+/* The line under each word the dust spells out. */
+.hero-caption {
+  position: absolute;
+  top: 66%;
+  left: var(--pad);
+  right: var(--pad);
+  z-index: 2;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 2.6vw, 2.4rem);
+  font-style: italic;
+  text-align: center;
+  color: var(--gold-light);
+  opacity: 0;
+  translate: 0 16px;
+  transition: opacity 0.6s var(--ease), translate 0.8s var(--ease);
+}
+
+.hero-caption.is-on {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .hero-chapter__title {
@@ -1282,56 +1309,6 @@ html.is-loading .wa-float {
   max-width: 36ch;
   margin: 0;
   color: var(--muted);
-}
-
-.hero-chapter--flight .hero-chapter__body {
-  margin-left: auto;
-}
-
-.hero-chapter--flight .eyebrow {
-  justify-content: flex-end;
-}
-
-.hero-statement {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 16vh var(--pad) 7vh;
-  font-size: clamp(3.6rem, 11vw, 12.5rem);
-  font-weight: 700;
-  line-height: 0.86;
-  letter-spacing: -0.05em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
-.hs-line {
-  display: block;
-  overflow: hidden;
-  padding-block: 0.03em;
-  filter: drop-shadow(0 6px 30px rgba(0, 0, 0, 0.55));
-}
-
-.hs-line--2 {
-  padding-left: 0.9em;
-}
-
-.hs-line--3 {
-  margin-top: auto;
-  align-self: flex-end;
-}
-
-.hs-word {
-  display: inline-block;
-}
-
-.hs-line--2 .hs-word {
-  font-size: 1.06em;
-  text-transform: none;
-  letter-spacing: -0.02em;
 }
 
 .hero-outro {
@@ -2421,8 +2398,20 @@ html.is-loading .wa-float {
 }
 
 /* Dimmed and melted into the page at its edges, so it reads as a backdrop for the headline. */
+.cta__backdrop {
+  position: absolute;
+  inset: 0;
+  opacity: 0.24;
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, transparent 30%, #000 100%);
+  mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, transparent 30%, #000 100%);
+}
+
+.cta__backdrop img {
+  object-fit: cover;
+}
+
 .cta__scene {
-  opacity: 0.6;
+  opacity: 0.75;
   -webkit-mask-image: radial-gradient(ellipse 75% 72% at 50% 50%, #000 40%, transparent 100%);
   mask-image: radial-gradient(ellipse 75% 72% at 50% 50%, #000 40%, transparent 100%);
 }
@@ -3254,8 +3243,8 @@ html.is-loading .wa-float {
 
 @media (max-width: 767px) {
   .hero {
-    height: 470vh;
-    height: 470svh;
+    height: 420vh;
+    height: 420svh;
   }
 
   .nav__cta-long {
@@ -3294,20 +3283,11 @@ html.is-loading .wa-float {
     height: 28px;
   }
 
-  .hero-chapter,
-  .hero-chapter--flight {
+  .hero-chapter {
     left: var(--pad);
     right: var(--pad);
     bottom: max(36px, 5svh);
     text-align: left;
-  }
-
-  .hero-chapter--flight .eyebrow {
-    justify-content: flex-start;
-  }
-
-  .hero-chapter--flight .hero-chapter__body {
-    margin-left: 0;
   }
 
   .hero-chapter__title {
@@ -3317,15 +3297,6 @@ html.is-loading .wa-float {
 
   .hero-chapter__body {
     font-size: 0.95rem;
-  }
-
-  .hero-statement {
-    padding: 15svh var(--pad) 9svh;
-    font-size: clamp(3.2rem, 17vw, 6rem);
-  }
-
-  .hs-line--2 {
-    padding-left: 0.4em;
   }
 
   .hero-outro {
@@ -3445,14 +3416,6 @@ html.is-loading .wa-float {
   .hero-swap__word,
   .preloader__mark-fill {
     animation: none;
-  }
-
-  .hs-line {
-    filter: none;
-  }
-
-  .hero__particles {
-    mix-blend-mode: normal;
   }
 
   .grain {
@@ -3577,6 +3540,10 @@ html.is-loading .wa-float {
 @keyframes wave {
   0%, 100% { translate: 0 -0.035em; }
   50% { translate: 0 0.035em; }
+}
+@keyframes backdrop-drift {
+  from { transform: scale(1.04) translate3d(-1%, -1%, 0); }
+  to { transform: scale(1.14) translate3d(1.5%, 1%, 0); }
 }
 @keyframes a-spin {
   to { transform: rotate(360deg); }

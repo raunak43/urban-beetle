@@ -1,14 +1,18 @@
+import Image from "next/image";
+import DustScene from "../DustScene";
 import Particles from "../Particles";
-import TakeoffScene from "../TakeoffScene";
 import { Words } from "../Text";
 
 // The closing call to action. The section is taller than the screen and its stage stays pinned while the
-// beetle behind the headline takes off (TakeoffScene), so the page ends where the hero began.
+// gold dust behind the headline forms the logo and flies apart (DustScene), so the page ends as the hero began.
 export default function CTA() {
   return (
     <section className="cta sheet" id="start" data-surface="ink" aria-label="Start a project">
       <div className="cta__stage">
-        <TakeoffScene className="cta__scene" />
+        <div className="cta__backdrop" aria-hidden="true">
+          <Image src="/images/gold-dust.webp" alt="" fill sizes="100vw" />
+        </div>
+        <DustScene className="cta__scene" />
         <Particles className="cta__particles" density={0.5} />
         <div className="cta__shade" aria-hidden="true" />
         <div className="container cta__inner">

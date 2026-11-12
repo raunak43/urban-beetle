@@ -1,6 +1,6 @@
 import Cursor from "@/components/Cursor";
 import FocusBlur from "@/components/FocusBlur";
-import HeroSequence from "@/components/HeroSequence";
+import Hero from "@/components/Hero";
 import LiveMotion from "@/components/LiveMotion";
 import Marquee from "@/components/Marquee";
 import MotionEffects from "@/components/MotionEffects";
@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Order matters: the preloader must subscribe before the hero starts loading frames. */}
+      {/* Order matters: the preloader must subscribe before the hero reports that it is ready. */}
       <Preloader />
       <SmoothScroll />
       <Cursor />
@@ -47,7 +47,7 @@ export default function Home() {
       <Nav />
 
       <main id="main">
-        <HeroSequence />
+        <Hero />
         <Statement />
         {/* Two bands of type crossing like tape, the second naming what the studio does. */}
         <div className="bands" data-surface="paper">
