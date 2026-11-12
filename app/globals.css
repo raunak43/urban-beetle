@@ -614,88 +614,98 @@ html.is-loading .wa-float {
   transition: opacity 0.7s var(--ease), visibility 0s;
 }
 
-/* ---------- Preloader ---------- */
+/* ---------- Preloader ----------
+   A sheet of paper over the whole screen: a giant count in the corner and the three pillars turning
+   over in the middle. It lifts away when the count reaches 100 (components/Preloader.tsx). */
 
 .preloader {
-  --fill: 100%;
   position: fixed;
   inset: 0;
   z-index: 200;
   display: grid;
-  place-items: center;
-  background: var(--bg);
-  clip-path: inset(0 0 0 0);
-}
-
-.preloader__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  width: min(360px, 78vw);
-}
-
-.preloader__mark {
-  position: relative;
-  height: 104px;
-  aspect-ratio: 480 / 782;
-  filter: drop-shadow(0 0 18px rgba(212, 169, 79, 0.35));
-}
-
-.preloader__mark .logo-mark {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-}
-
-/* Empty outline that fills with gold from the bottom as frames load. */
-.preloader__mark-base {
-  background: rgba(255, 255, 255, 0.09);
-  animation: none;
-}
-
-.preloader__mark-fill {
-  clip-path: inset(var(--fill) 0 0 0);
-}
-
-.preloader__name {
-  margin: 0;
-  padding-left: 0.55em;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.55em;
-  text-transform: uppercase;
-}
-
-.preloader__meter {
-  width: 100%;
-  height: 1px;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(22px, 3vw, 44px) var(--pad);
   overflow: hidden;
-  background: var(--line);
+  border-radius: 0 0 var(--sheet) var(--sheet);
 }
 
-.preloader__bar {
-  height: 100%;
-  background: var(--gold-grad);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-}
-
-.preloader__meta {
+.preloader__top {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  gap: 20px;
   margin: 0;
   font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.16em;
+  font-size: 12px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
+.preloader__top span:first-child {
+  color: var(--text);
+}
+
+/* Every word sits in the same cell; the one in turn rises into it and the last one leaves upward. */
+.preloader__words {
+  display: grid;
+  align-self: center;
+  margin: 0;
+  overflow: hidden;
+  padding-bottom: 0.2em;
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 9vw, 8.5rem);
+  font-style: italic;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.preloader__word {
+  grid-area: 1 / 1;
+  padding-bottom: 0.14em;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform: translateY(125%);
+  transition: transform 0.7s var(--ease);
+}
+
+.preloader__word.is-on {
+  transform: none;
+}
+
+.preloader__word.is-past {
+  transform: translateY(-125%);
+}
+
 .preloader__count {
-  color: var(--gold);
+  justify-self: end;
+  margin: 0;
+  font-size: clamp(6rem, 24vw, 22rem);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
   font-variant-numeric: tabular-nums;
+}
+
+.preloader__count small {
+  margin-left: 0.06em;
+  font-size: 0.28em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--gold);
+  vertical-align: top;
+}
+
+.preloader__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #b98a30, #f0d48c 50%, #d4a94f);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
 }
 
 /* ---------- Cursor ---------- */
@@ -3391,8 +3401,7 @@ html.is-loading .wa-float {
   .cta__button,
   .nav__mark,
   .footer__mark,
-  .hero-swap__word,
-  .preloader__mark-fill {
+  .hero-swap__word {
     animation: none;
   }
 

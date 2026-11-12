@@ -1,22 +1,26 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import BeetleMark from "./BeetleMark";
 import { gsap, loader } from "@/lib/motion";
 
-const MIN_VISIBLE_MS = 1400;
+const MIN_VISIBLE_MS = 1700;
 // Once the intro has played in this browser tab, returning to the home page (e.g. from a service page)
-// doesn't hold the preloader for its minimum time; it leaves as soon as the frames and fonts are ready.
+// doesn't hold the preloader for its minimum time; it leaves as soon as the page and fonts are ready.
 const SEEN_KEY = "ub-intro-seen";
 const FONT_WAIT_MS = 2500;
+// One word per third of the count.
+const WORDS = ["Strategy", "Creativity", "Technology"];
 
+// The opening screen: a sheet of paper with a giant count and the three pillars turning over. When
+// the count reaches 100 the sheet lifts away, and the gold dust behind it bursts out of the logo.
 export default function Preloader() {
   const rootRef = useRef<HTMLDivElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
-  const fillRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = rootRef.current!;
+    const words = Array.from(root.querySelectorAll<HTMLElement>(".preloader__word"));
     // Scrolling stays locked while the preloader is up (only pages with a preloader get this).
     document.documentElement.classList.add("is-loading");
     const started = performance.now();
@@ -29,13 +33,17 @@ export default function Preloader() {
     let leaving = false;
 
     const render = () => {
-      const pct = Math.round(shown.value * 100);
-      countRef.current!.textContent = String(pct).padStart(3, "0");
-      fillRef.current!.style.transform = `scaleX(${shown.value})`;
-      root.style.setProperty("--fill", `${(1 - shown.value) * 100}%`);
+      countRef.current!.textContent = String(Math.round(shown.value * 100));
+      barRef.current!.style.transform = `scaleX(${shown.value})`;
+      const active = Math.min(WORDS.length - 1, Math.floor(shown.value * WORDS.length));
+      words.forEach((w, i) => {
+        w.classList.toggle("is-on", i === active);
+        w.classList.toggle("is-past", i < active);
+      });
     };
+    render();
 
-    const chase = (target: number, duration = 0.6) =>
+    const chase = (target: number, duration = 1.3) =>
       gsap.to(shown, { value: target, duration, ease: "power2.out", overwrite: true, onUpdate: render });
 
     let cancelled = false;
@@ -56,18 +64,19 @@ export default function Preloader() {
       gsap
         .timeline({ delay: wait })
         .add(chase(1, 0.5))
-        .to(root.querySelectorAll(".preloader__inner > *"), {
-          yPercent: -40,
+        .to(root.querySelectorAll(".preloader__top, .preloader__words, .preloader__count"), {
+          yPercent: -30,
           opacity: 0,
-          duration: 0.6,
-          stagger: 0.05,
+          duration: 0.5,
+          stagger: 0.06,
           ease: "power3.in",
         })
-        .to(root, { clipPath: "inset(0 0 100% 0)", duration: 1.1, ease: "expo.inOut" }, "-=0.15")
+        // The sheet lifts off the page.
+        .to(root, { yPercent: -105, duration: 1.1, ease: "expo.inOut" }, "-=0.15")
         .add(() => {
           document.documentElement.classList.remove("is-loading");
           loader.startIntro();
-        }, "-=0.55")
+        }, "-=0.6")
         .set(root, { display: "none" });
     };
 
@@ -81,23 +90,23 @@ export default function Preloader() {
   }, []);
 
   return (
-    <div ref={rootRef} className="preloader" aria-hidden="true">
-      <div className="preloader__inner">
-        <div className="preloader__mark">
-          <BeetleMark className="preloader__mark-base" />
-          <BeetleMark className="preloader__mark-fill" />
-        </div>
-        <p className="preloader__name">Urban Beetle</p>
-        <div className="preloader__meter">
-          <div ref={fillRef} className="preloader__bar" />
-        </div>
-        <p className="preloader__meta">
-          <span>Preparing the experience</span>
-          <span ref={countRef} className="preloader__count">
-            000
+    <div ref={rootRef} className="preloader" data-surface="paper" aria-hidden="true">
+      <p className="preloader__top">
+        <span>Urban Beetle</span>
+        <span>Creative marketing agency</span>
+      </p>
+      <p className="preloader__words">
+        {WORDS.map((word, i) => (
+          <span key={word} className={i === 0 ? "preloader__word is-on" : "preloader__word"}>
+            {word}
           </span>
-        </p>
-      </div>
+        ))}
+      </p>
+      <p className="preloader__count">
+        <span ref={countRef}>0</span>
+        <small>%</small>
+      </p>
+      <div ref={barRef} className="preloader__bar" />
     </div>
   );
 }
