@@ -7,8 +7,6 @@ import { Eyebrow, Words, pad2 } from "../Text";
 const SURFACES = ["ink", "gold", "scarab"] as const;
 
 export default function Statement() {
-  const [strategy, creativity, technology] = pillars;
-
   return (
     <section className="statement sheet" id="statement" data-surface="paper" aria-label="Brand statement">
       <div className="container">
@@ -18,13 +16,7 @@ export default function Statement() {
             parts={[
               "Urban Beetle is a creative marketing agency for brands that",
               { em: "refuse to stand still." },
-              "We fuse",
-              { chip: strategy.image },
-              "strategy,",
-              { chip: creativity.image },
-              "creativity and",
-              { chip: technology.image },
-              "technology to turn ordinary businesses into brands people",
+              "We fuse strategy, creativity and technology to turn ordinary businesses into brands people",
               { em: "remember." },
             ]}
           />

@@ -1421,28 +1421,6 @@ html.is-loading .wa-float {
   overflow: visible;
 }
 
-/* Small photos set into the sentence like words (see <Words>). They widen under the pointer. */
-.chip {
-  width: 1.7em;
-  height: 0.8em;
-  margin: 0 0.04em;
-  overflow: hidden;
-  border-radius: 999px;
-  vertical-align: -0.05em;
-  background: var(--ink);
-  transition: width 0.8s var(--ease);
-}
-
-.chip:hover {
-  width: 2.7em;
-}
-
-.chip img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .statement__foot {
   display: flex;
   flex-wrap: wrap;
